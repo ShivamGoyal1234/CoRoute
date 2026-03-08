@@ -33,4 +33,8 @@ export default {
     pass: process.env.SMTP_PASS || '',
     from: process.env.SMTP_FROM || process.env.SMTP_USER || 'noreply@coroute.com',
   },
+  resend: {
+    apiKey: process.env.RESEND_API_KEY || '',
+    from: process.env.RESEND_FROM || 'CoRoute <onboarding@resend.dev>',
+  },
 };
