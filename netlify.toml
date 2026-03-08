@@ -6,6 +6,12 @@
   command = "npm run build"
   publish = "dist"
 
+# SPA fallback: serve index.html for all routes so client-side router works on refresh/direct URLs
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # Headers to fix JS module MIME type (application/octet-stream → application/javascript)
 # Also applied via frontend/public/_headers copied into dist
 [[headers]]
