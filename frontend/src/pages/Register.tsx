@@ -397,6 +397,7 @@ export default function Register() {
             )}
           </form>
 
+          {/* Google / Apple signup — commented out
           <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
             <span className="text-xs font-medium uppercase tracking-wider" style={{ color: colors.textMuted }}>
@@ -430,6 +431,7 @@ export default function Register() {
               Apple
             </button>
           </div>
+          */}
 
           <p className="mt-8 text-center text-sm" style={{ color: colors.textMuted }}>
             Already have an account?{' '}
