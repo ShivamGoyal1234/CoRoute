@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const sendOtp = useCallback(async (email: string, purpose: 'register' | 'forgot_password') => {
-    await api.post<{ message: string }>('/auth/send-otp', { email, purpose });
+    await api.post<{ message: string }>('/auth/send-otp', { email, purpose }, { timeout: 60000 });
   }, []);
 
   const register = useCallback(async (email: string, password: string, name: string, otp: string, avatarUrlOrFile?: string | File) => {
