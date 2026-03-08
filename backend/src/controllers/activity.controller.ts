@@ -16,7 +16,7 @@ export const createActivity = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { dayId, title, description, location, startTime, endTime, cost, status, imageUrl } = req.body;
+    const { dayId, title, description, location, startTime, endTime, cost, status, imageUrl, expenseCategory, coordinates } = req.body;
 
     const day = await Day.findById(dayId);
     if (!day) {
@@ -39,6 +39,8 @@ export const createActivity = async (req: AuthRequest, res: Response) => {
       status: status || 'planned',
       imageUrl: imageUrl || '',
       ...(userId && { userId }),
+      ...(expenseCategory && { expenseCategory }),
+      ...(coordinates && typeof coordinates?.lat === 'number' && typeof coordinates?.lng === 'number' && { coordinates }),
     });
 
     await activity.save();
@@ -129,7 +131,7 @@ export const getActivityById = async (req: AuthRequest, res: Response) => {
 export const updateActivity = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, description, location, startTime, endTime, cost, status, imageUrl } = req.body;
+    const { title, description, location, startTime, endTime, cost, status, imageUrl, expenseCategory, coordinates } = req.body;
 
     const updateFields: Record<string, unknown> = {};
     if (title !== undefined) updateFields.title = title;
@@ -140,6 +142,10 @@ export const updateActivity = async (req: AuthRequest, res: Response) => {
     if (cost !== undefined) updateFields.cost = cost;
     if (status !== undefined) updateFields.status = status;
     if (imageUrl !== undefined) updateFields.imageUrl = imageUrl;
+    if (expenseCategory !== undefined) updateFields.expenseCategory = expenseCategory;
+    if (coordinates !== undefined && typeof coordinates?.lat === 'number' && typeof coordinates?.lng === 'number') {
+      updateFields.coordinates = coordinates;
+    }
 
     const activity = await Activity.findByIdAndUpdate(
       id,

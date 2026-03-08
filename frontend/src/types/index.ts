@@ -65,6 +65,13 @@ export interface Day {
 
 export type ActivityStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled';
 
+export type ExpenseCategory = 'food' | 'shop' | 'other';
+
+export interface ActivityCoordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface Activity {
   _id: string;
   dayId: string;
@@ -79,6 +86,8 @@ export interface Activity {
   imageUrl?: string;
   userId?: User | { _id: string; name: string; email?: string; avatarUrl?: string };
   commentCount?: number;
+  expenseCategory?: ExpenseCategory;
+  coordinates?: ActivityCoordinates;
   createdAt?: string;
   updatedAt?: string;
 }

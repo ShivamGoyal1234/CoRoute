@@ -1,7 +1,7 @@
 import { ItinerarySection } from './ItinerarySection';
 import { BudgetingSection } from './BudgetingSection';
 import { OrganizationSection } from './OrganizationSection';
-import { TripLocationMap } from '../../components/TripLocationMap';
+import { RouteMap } from '../../components/RouteMap';
 import type { useTripDetail } from './useTripDetail';
 
 type TripDetailState = ReturnType<typeof useTripDetail>;
@@ -112,11 +112,14 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
           onDeleteFile={state.deleteTripFile}
         />
       )}
-      {section === 'shared-map' && (
+      {section === 'shared-map' && trip && (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden p-6">
-          <div className="flex-1 min-h-[280px] rounded-xl overflow-hidden">
-            <TripLocationMap location={trip?.location} style={{ minHeight: '100%', height: '100%' }} showZoomControl />
-          </div>
+          <RouteMap
+            trip={trip}
+            activitiesByDay={activitiesByDay}
+            days={days}
+            style={{ flex: 1, minHeight: 0 }}
+          />
         </div>
       )}
     </main>

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { activitiesApi, commentsApi, attachmentsApi, attachmentUrl } from '../lib/api';
-import type { Activity, Comment, Attachment } from '../types';
+import type { Activity, Comment, Attachment, ExpenseCategory } from '../types';
 import { formatPrice, formatTime, getInitials } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket, type TypingUser } from '../contexts/SocketContext';
@@ -276,6 +276,23 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                     </div>
                   </div>
                   <div>
+                    <label className="block text-sm" style={{ color: colors.textMuted }}>Expense category (for map)</label>
+                    <select
+                      value={activity.expenseCategory ?? 'other'}
+                      onChange={(e) => {
+                        const expenseCategory = e.target.value as ExpenseCategory;
+                        setActivity((a) => (a ? { ...a, expenseCategory } : null));
+                        handleSaveActivity({ expenseCategory });
+                      }}
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
+                    >
+                      <option value="food">Food</option>
+                      <option value="shop">Shopping</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm" style={{ color: colors.textMuted }}>Status</label>
                     <select
                       value={activity.status}
@@ -300,7 +317,12 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                   {activity.startTime && <p>Time: {formatTime(activity.startTime)}</p>}
                   {activity.description && <p>{activity.description}</p>}
                   {activity.location && <p>Location: {activity.location}</p>}
-                  {activity.cost != null && activity.cost > 0 && <p>Cost: {formatPrice(activity.cost, 'USD')}</p>}
+                  {activity.cost != null && activity.cost > 0 && (
+                    <p>
+                      Cost: {formatPrice(activity.cost, 'USD')}
+                      {activity.expenseCategory && ` · ${activity.expenseCategory === 'food' ? 'Food' : activity.expenseCategory === 'shop' ? 'Shopping' : 'Other'}`}
+                    </p>
+                  )}
                   {activity.imageUrl && (
                     <img src={activity.imageUrl.startsWith('http') ? activity.imageUrl : attachmentUrl(activity.imageUrl)} alt="" className="rounded-lg max-h-48 object-cover w-full mt-2" />
                   )}

@@ -7,6 +7,7 @@ import type {
   Membership,
   Day,
   Activity,
+  ActivityCoordinates,
   Comment,
   Attachment,
   TripFile,
@@ -14,6 +15,7 @@ import type {
   TripStats,
   MemberRole,
   ActivityStatus,
+  ExpenseCategory,
   ChecklistCategory,
 } from '../types';
 
@@ -93,8 +95,10 @@ export const activitiesApi = {
     cost?: number;
     status?: ActivityStatus;
     imageUrl?: string;
+    expenseCategory?: ExpenseCategory;
+    coordinates?: ActivityCoordinates;
   }) => api.post<{ activity: Activity }>('/activities', data),
-  update: (id: string, data: Partial<Pick<Activity, 'title' | 'description' | 'location' | 'startTime' | 'endTime' | 'cost' | 'status' | 'imageUrl'>>) =>
+  update: (id: string, data: Partial<Pick<Activity, 'title' | 'description' | 'location' | 'startTime' | 'endTime' | 'cost' | 'status' | 'imageUrl' | 'expenseCategory' | 'coordinates'>>) =>
     api.put<{ activity: Activity }>(`/activities/${id}`, data),
   reorder: (activities: { id: string; orderIndex: number }[]) =>
     api.post('/activities/reorder', { activities }),

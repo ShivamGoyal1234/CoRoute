@@ -110,6 +110,7 @@ export function BudgetingSection({
   const [manualDescription, setManualDescription] = useState('');
   const [manualAmount, setManualAmount] = useState('');
   const [manualCategory, setManualCategory] = useState<string>('Food');
+  const [manualLocation, setManualLocation] = useState('');
   const [selectedPayerId, setSelectedPayerId] = useState<string | null>(
     () => members[0]?._id ?? null
   );
@@ -188,9 +189,11 @@ export function BudgetingSection({
         title,
         description: manualCategory,
         cost: amount,
+        ...(manualLocation.trim() && { location: manualLocation.trim() }),
       });
       setManualDescription('');
       setManualAmount('');
+      setManualLocation('');
       if (onManualExpenseAdded) await onManualExpenseAdded();
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to add expense';
@@ -432,6 +435,19 @@ export function BudgetingSection({
                       value={manualDescription}
                       onChange={(e) => setManualDescription(e.target.value)}
                       placeholder="e.g. Dinner at Tokyo Tower"
+                      className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-offset-0"
+                      style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text, ['--tw-ring-color' as string]: colors.primary }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: colors.textMuted }}>
+                      Location <span className="font-normal normal-case opacity-70">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={manualLocation}
+                      onChange={(e) => setManualLocation(e.target.value)}
+                      placeholder="e.g. Shibuya, Tokyo, Japan"
                       className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-offset-0"
                       style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text, ['--tw-ring-color' as string]: colors.primary }}
                     />

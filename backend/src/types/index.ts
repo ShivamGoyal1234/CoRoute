@@ -64,6 +64,13 @@ export enum ActivityStatus {
   CANCELLED = 'cancelled',
 }
 
+export type ExpenseCategory = 'food' | 'shop' | 'other';
+
+export interface IActivityCoordinates {
+  lat: number;
+  lng: number;
+}
+
 export interface IActivity {
   dayId: Types.ObjectId;
   title: string;
@@ -76,6 +83,8 @@ export interface IActivity {
   status: ActivityStatus;
   imageUrl?: string;
   userId?: Types.ObjectId;
+  expenseCategory?: ExpenseCategory;
+  coordinates?: IActivityCoordinates;
   createdAt: Date;
   updatedAt: Date;
 }

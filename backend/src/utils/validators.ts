@@ -44,6 +44,10 @@ export const validateActivity = [
   body('dayId').isMongoId().withMessage('Valid day ID required'),
   body('title').trim().notEmpty().withMessage('Title is required'),
   body('cost').optional().isFloat({ min: 0 }).withMessage('Cost must be positive'),
+  body('expenseCategory').optional().isIn(['food', 'shop', 'other']).withMessage('Expense category must be food, shop, or other'),
+  body('coordinates').optional().isObject().withMessage('Coordinates must be an object'),
+  body('coordinates.lat').optional().isFloat({ min: -90, max: 90 }).withMessage('Valid latitude required'),
+  body('coordinates.lng').optional().isFloat({ min: -180, max: 180 }).withMessage('Valid longitude required'),
 ];
 
 export const validateComment = [

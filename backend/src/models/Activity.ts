@@ -53,6 +53,18 @@ const activitySchema = new Schema<IActivityDocument>(
       ref: 'User',
       default: null,
     },
+    expenseCategory: {
+      type: String,
+      enum: ['food', 'shop', 'other'],
+      default: undefined,
+    },
+    coordinates: {
+      type: {
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true },
+      },
+      default: undefined,
+    },
   },
   {
     timestamps: true,

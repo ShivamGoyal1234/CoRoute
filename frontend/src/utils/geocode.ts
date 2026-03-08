@@ -17,6 +17,11 @@ declare global {
 
 const DEFAULT_ZOOM = 11;
 
+export interface LatLngLiteral {
+  lat: number;
+  lng: number;
+}
+
 /**
  * Geocode an address string using Google Maps Geocoder.
  * Requires Google Maps JS API to be loaded (e.g. via useLoadScript).
@@ -47,4 +52,11 @@ export function geocodeAddress(address: string): Promise<TripLocation | null> {
       });
     });
   });
+}
+
+/**
+ * Geocode an address and return only lat/lng, or null if geocoding fails.
+ */
+export function geocodeToLatLng(address: string): Promise<LatLngLiteral | null> {
+  return geocodeAddress(address).then((loc) => (loc ? { lat: loc.lat, lng: loc.lng } : null));
 }
