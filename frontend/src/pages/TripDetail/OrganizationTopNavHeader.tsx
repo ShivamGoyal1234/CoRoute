@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { getInitials } from '../../utils/helpers';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 import type { SectionId } from './types';
 
 function formatNotificationTime(timestamp: string) {
@@ -45,6 +45,7 @@ export function OrganizationTopNavHeader({
   onLogoutToggle,
   onLogout,
 }: OrganizationTopNavHeaderProps) {
+  const colors = useLandingColors();
   const { user: currentUser } = useAuth();
   const {
     notifications,
@@ -74,21 +75,21 @@ export function OrganizationTopNavHeader({
     <header
       className="relative shrink-0 flex items-center justify-between gap-6 px-6 h-14 border-b border-t"
       style={{
-        borderTopColor: 'rgba(59, 130, 246, 0.35)',
-        borderBottomColor: 'rgba(226, 232, 240, 0.8)',
-        backgroundColor: '#fff',
+        borderTopColor: colors.border,
+        borderBottomColor: colors.border,
+        backgroundColor: colors.surface,
       }}
     >
       <div className="flex items-center gap-4 min-w-0 flex-1 h-9">
         <div
           className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-          style={{ backgroundColor: landingColors.primary }}
+          style={{ backgroundColor: colors.primary }}
         >
           <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-2-1.5V6l2-1.5 2 1.5v12.5L9 20zm-6-1.5l2-1.5V4.5L3 6v12.5zm12 0l2-1.5V4.5L21 6v12.5l-2 1.5z" />
           </svg>
         </div>
-        <span className="font-bold text-base shrink-0 leading-9 truncate max-w-[200px] sm:max-w-[280px] text-slate-800" title={tripTitle}>
+        <span className="font-bold text-base shrink-0 leading-9 truncate max-w-[200px] sm:max-w-[280px]" style={{ color: colors.text }} title={tripTitle}>
           {tripTitle}
         </span>
         <nav
@@ -104,14 +105,14 @@ export function OrganizationTopNavHeader({
                 onClick={() => id && onSectionChange(id)}
                 className="px-4 h-9 flex items-center text-sm font-medium transition-colors relative"
                 style={{
-                  color: isActive ? landingColors.primary : landingColors.text,
+                  color: isActive ? colors.primary : colors.text,
                 }}
               >
                 {label}
                 {isActive && (
                   <span
                     className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full"
-                    style={{ backgroundColor: landingColors.primary }}
+                    style={{ backgroundColor: colors.primary }}
                   />
                 )}
               </button>
@@ -126,7 +127,7 @@ export function OrganizationTopNavHeader({
             type="button"
             onClick={handleBellClick}
             className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none relative"
-            style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: landingColors.primary }}
+            style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
             title="Notifications"
             aria-label="Notifications"
             aria-expanded={notificationOpen}
@@ -137,7 +138,7 @@ export function OrganizationTopNavHeader({
             {unreadNotificationCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{ backgroundColor: landingColors.primary }}
+                style={{ backgroundColor: colors.primary }}
               >
                 {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
               </span>
@@ -145,18 +146,18 @@ export function OrganizationTopNavHeader({
           </button>
           {notificationOpen && (
             <div
-              className="absolute right-0 top-full mt-2 w-80 max-h-[min(24rem,70vh)] flex flex-col rounded-xl border shadow-xl bg-white z-50 overflow-hidden"
-              style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+              className="absolute right-0 top-full mt-2 w-80 max-h-[min(24rem,70vh)] flex flex-col rounded-xl border shadow-xl z-50 overflow-hidden"
+              style={{ borderColor: colors.border, backgroundColor: colors.surface }}
             >
               <div
                 className="shrink-0 px-4 py-3 border-b flex items-center justify-between"
-                style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                style={{ borderColor: colors.border }}
               >
-                <span className="text-sm font-semibold" style={{ color: landingColors.text }}>
+                <span className="text-sm font-semibold" style={{ color: colors.text }}>
                   Notifications
                 </span>
                 {notifications.length > 0 && (
-                  <span className="text-xs" style={{ color: landingColors.textMuted }}>
+                  <span className="text-xs" style={{ color: colors.textMuted }}>
                     {notifications.length} total
                   </span>
                 )}
@@ -164,36 +165,39 @@ export function OrganizationTopNavHeader({
               <div className="flex-1 overflow-y-auto min-h-0">
                 {notifications.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className="text-sm" style={{ color: landingColors.textMuted }}>
+                    <p className="text-sm" style={{ color: colors.textMuted }}>
                       No notifications yet
                     </p>
-                    <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+                    <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
                       Updates from your team will appear here
                     </p>
                   </div>
                 ) : (
-                  <ul className="divide-y divide-slate-100">
+                  <ul className="divide-y" style={{ borderColor: colors.border }}>
                     {[...notifications].reverse().map((n) => (
                       <li
                         key={n.id}
-                        className="flex gap-3 px-4 py-3 hover:bg-slate-50/80 transition-colors"
+                        className="flex gap-3 px-4 py-3 transition-colors"
+                        style={{ backgroundColor: 'transparent' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       >
                         <div
                           className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold"
-                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                         >
                           {getInitials(n.actorName)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium" style={{ color: landingColors.text }}>
+                          <p className="text-sm font-medium" style={{ color: colors.text }}>
                             {n.title}
                           </p>
                           {n.body && (
-                            <p className="text-xs mt-0.5 line-clamp-2" style={{ color: landingColors.textMuted }}>
+                            <p className="text-xs mt-0.5 line-clamp-2" style={{ color: colors.textMuted }}>
                               {n.body}
                             </p>
                           )}
-                          <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+                          <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
                             {n.actorName} · {formatNotificationTime(n.timestamp)}
                           </p>
                         </div>
@@ -208,7 +212,7 @@ export function OrganizationTopNavHeader({
         <Link
           to={`/settings?tripId=${tripId}`}
           className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none"
-          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: landingColors.primary }}
+          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
           title="Settings"
           aria-label="Settings"
         >
@@ -219,12 +223,13 @@ export function OrganizationTopNavHeader({
         </Link>
         {currentUser && (
           <div
-            className="relative flex items-center gap-2 pl-2 border-l"
-            style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+className="relative flex items-center gap-2 pl-2 border-l"
+            style={{ borderColor: colors.border }}
           >
             <button
               type="button"
-              className="relative w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium shrink-0 focus:outline-none overflow-visible border-2 border-slate-200"
+              className="relative w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium shrink-0 focus:outline-none overflow-visible border-2"
+              style={{ borderColor: colors.border }}
               style={{ backgroundColor: '#e8d5c4' }}
               title={currentUser.email}
               onClick={onLogoutToggle}
@@ -232,16 +237,19 @@ export function OrganizationTopNavHeader({
               {currentUser.avatarUrl ? (
                 <img src={currentUser.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
               ) : (
-                <span className="text-slate-700 font-medium">{getInitials(currentUser.name)}</span>
+                <span className="font-medium" style={{ color: colors.text }}>{getInitials(currentUser.name)}</span>
               )}
             </button>
             {showLogout && (
               <div
-                className="absolute right-0 top-[110%] z-50 bg-white border rounded-lg shadow-lg min-w-[120px] py-2"
-                style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[120px] py-2"
+                style={{ borderColor: colors.border, backgroundColor: colors.surface }}
               >
                 <button
-                  className="w-full text-left px-4 py-2 text-sm text-black hover:bg-slate-100"
+                  className="w-full text-left px-4 py-2 text-sm transition-colors"
+                  style={{ color: colors.text }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                   onClick={() => {
                     onLogoutToggle();
                     onLogout();

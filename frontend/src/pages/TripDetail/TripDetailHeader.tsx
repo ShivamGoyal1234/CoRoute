@@ -4,7 +4,7 @@ import type { Trip, Membership } from '../../types';
 import { formatDateRangeShort, getInitials } from '../../utils/helpers';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 import type { SectionId } from './types';
 
 function formatNotificationTime(timestamp: string) {
@@ -42,6 +42,7 @@ export function TripDetailHeader({
   onLogoutToggle,
   onLogout,
 }: TripDetailHeaderProps) {
+  const colors = useLandingColors();
   const showNewExpense = section === 'budgeting' && onNewExpenseClick;
   const showEditTrip = section === 'itinerary' && canEdit && onEditTripClick;
   const { user: currentUser } = useAuth();
@@ -72,30 +73,30 @@ export function TripDetailHeader({
   return (
     <header
       className="shrink-0 flex items-center justify-between gap-4 px-6 py-3 border-b"
-      style={{ borderColor: 'rgba(226, 232, 240, 0.8)', backgroundColor: '#F8F8FC' }}
+      style={{ borderColor: colors.border, backgroundColor: colors.headerBg }}
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ backgroundColor: landingColors.primary }}
+            style={{ backgroundColor: colors.primary }}
           >
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
           </div>
           <div className="min-w-0">
-            <h1 className="font-bold text-base truncate" style={{ color: landingColors.text }}>
+            <h1 className="font-bold text-base truncate" style={{ color: colors.text }}>
               {trip.title}
             </h1>
-            <p className="text-xs truncate" style={{ color: landingColors.textMuted }}>
+            <p className="text-xs truncate" style={{ color: colors.textMuted }}>
               {formatDateRangeShort(trip.startDate, trip.endDate)}
             </p>
           </div>
         </div>
         <div
           className="w-px h-10 shrink-0"
-          style={{ backgroundColor: 'rgba(148, 163, 184, 0.5)' }}
+          style={{ backgroundColor: colors.border }}
           aria-hidden
         />
         <div className="flex items-center gap-1 shrink-0">
@@ -103,8 +104,8 @@ export function TripDetailHeader({
             const u = typeof m.userId === 'object' ? m.userId : null;
             const name = u?.name ?? '?';
             const isOwnerRole = m.role === 'owner';
-            const borderColor = isOwnerRole ? landingColors.primary : '#94a3b8';
-            const pillBg = isOwnerRole ? landingColors.primary : m.role === 'editor' ? '#64748b' : '#94a3b8';
+            const borderColor = isOwnerRole ? colors.primary : '#94a3b8';
+            const pillBg = isOwnerRole ? colors.primary : m.role === 'editor' ? '#64748b' : '#94a3b8';
             const pillLabel = isOwnerRole ? 'OWN' : m.role === 'editor' ? 'EDITOR' : 'VIEWER';
             return (
               <div
@@ -115,12 +116,12 @@ export function TripDetailHeader({
               >
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden border-2 shadow"
-                  style={{ borderColor, backgroundColor: '#fff' }}
+                  style={{ borderColor, backgroundColor: colors.surface }}
                 >
                   {u?.avatarUrl ? (
                     <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span style={{ color: landingColors.primary }}>{getInitials(name)}</span>
+                    <span style={{ color: colors.primary }}>{getInitials(name)}</span>
                   )}
                 </div>
                 <span
@@ -135,7 +136,7 @@ export function TripDetailHeader({
           {members.length > 3 && (
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-              style={{ marginLeft: -8, backgroundColor: '#e2e8f0', color: landingColors.text, zIndex: 0 }}
+              style={{ marginLeft: -8, backgroundColor: colors.border, color: colors.text, zIndex: 0 }}
             >
               +{members.length - 3}
             </div>
@@ -150,7 +151,7 @@ export function TripDetailHeader({
             onClick={onNewExpenseClick}
             className="px-4 py-2 rounded-xl font-medium text-white transition-opacity hover:opacity-95"
             style={{
-              backgroundColor: landingColors.primary,
+              backgroundColor: colors.primary,
               boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
             }}
           >
@@ -163,8 +164,8 @@ export function TripDetailHeader({
             onClick={onEditTripClick}
             className="px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-95 flex items-center gap-2 border"
             style={{
-              color: landingColors.primary,
-              borderColor: landingColors.primary,
+              color: colors.primary,
+              borderColor: colors.primary,
               backgroundColor: 'transparent',
             }}
           >
@@ -180,7 +181,7 @@ export function TripDetailHeader({
             onClick={onShareClick}
             className="px-4 py-2 rounded-xl font-medium text-white transition-opacity hover:opacity-95"
             style={{
-              backgroundColor: landingColors.primary,
+              backgroundColor: colors.primary,
               boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
             }}
           >
@@ -192,7 +193,7 @@ export function TripDetailHeader({
             type="button"
             onClick={handleBellClick}
             className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none relative"
-            style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: landingColors.primary }}
+            style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
             title="Notifications"
             aria-label="Notifications"
             aria-expanded={notificationOpen}
@@ -203,7 +204,7 @@ export function TripDetailHeader({
             {unreadNotificationCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{ backgroundColor: landingColors.primary }}
+                style={{ backgroundColor: colors.primary }}
               >
                 {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
               </span>
@@ -211,18 +212,18 @@ export function TripDetailHeader({
           </button>
           {notificationOpen && (
             <div
-              className="absolute right-0 top-full mt-2 w-80 max-h-[min(24rem,70vh)] flex flex-col rounded-xl border shadow-xl bg-white z-50 overflow-hidden"
-              style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+              className="absolute right-0 top-full mt-2 w-80 max-h-[min(24rem,70vh)] flex flex-col rounded-xl border shadow-xl z-50 overflow-hidden"
+              style={{ borderColor: colors.border, backgroundColor: colors.surface }}
             >
               <div
                 className="shrink-0 px-4 py-3 border-b flex items-center justify-between"
-                style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                style={{ borderColor: colors.border }}
               >
-                <span className="text-sm font-semibold" style={{ color: landingColors.text }}>
+                <span className="text-sm font-semibold" style={{ color: colors.text }}>
                   Notifications
                 </span>
                 {notifications.length > 0 && (
-                  <span className="text-xs" style={{ color: landingColors.textMuted }}>
+                  <span className="text-xs" style={{ color: colors.textMuted }}>
                     {notifications.length} total
                   </span>
                 )}
@@ -230,10 +231,10 @@ export function TripDetailHeader({
               <div className="flex-1 overflow-y-auto min-h-0">
                 {notifications.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className="text-sm" style={{ color: landingColors.textMuted }}>
+                    <p className="text-sm" style={{ color: colors.textMuted }}>
                       No notifications yet
                     </p>
-                    <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+                    <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
                       Updates from your team will appear here
                     </p>
                   </div>
@@ -242,24 +243,27 @@ export function TripDetailHeader({
                     {[...notifications].reverse().map((n) => (
                       <li
                         key={n.id}
-                        className="flex gap-3 px-4 py-3 hover:bg-slate-50/80 transition-colors"
+                        className="flex gap-3 px-4 py-3 transition-colors"
+                    style={{ backgroundColor: 'transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       >
                         <div
                           className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold"
-                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                         >
                           {getInitials(n.actorName)}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium" style={{ color: landingColors.text }}>
+                          <p className="text-sm font-medium" style={{ color: colors.text }}>
                             {n.title}
                           </p>
                           {n.body && (
-                            <p className="text-xs mt-0.5 line-clamp-2" style={{ color: landingColors.textMuted }}>
+                            <p className="text-xs mt-0.5 line-clamp-2" style={{ color: colors.textMuted }}>
                               {n.body}
                             </p>
                           )}
-                          <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+                          <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
                             {n.actorName} · {formatNotificationTime(n.timestamp)}
                           </p>
                         </div>
@@ -274,7 +278,7 @@ export function TripDetailHeader({
         <Link
           to={`/settings?tripId=${trip._id}`}
           className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none"
-          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: landingColors.primary }}
+          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
           title="Settings"
           aria-label="Settings"
         >
@@ -286,12 +290,12 @@ export function TripDetailHeader({
         {currentUser && (
           <div
             className="relative flex items-center gap-2 pl-2 border-l"
-            style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+            style={{ borderColor: colors.border }}
           >
             <button
               type="button"
               className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium shrink-0 focus:outline-none"
-              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
               title={currentUser.email}
               onClick={onLogoutToggle}
             >
@@ -303,11 +307,14 @@ export function TripDetailHeader({
             </button>
             {showLogout && (
               <div
-                className="absolute right-0 top-[110%] z-50 bg-white border rounded-lg shadow-lg min-w-[120px] py-2"
-                style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[120px] py-2"
+                style={{ borderColor: colors.border, backgroundColor: colors.surface }}
               >
                 <button
-                  className="w-full text-left px-4 py-2 text-sm text-black hover:bg-slate-100"
+                  className="w-full text-left px-4 py-2 text-sm transition-colors"
+                  style={{ color: colors.text }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                   onClick={() => {
                     onLogoutToggle();
                     onLogout();

@@ -3,7 +3,7 @@ import type { ChecklistItem, TripFile } from '../../types';
 import type { Membership } from '../../types';
 import { getInitials } from '../../utils/helpers';
 import { fileUrl } from '../../lib/api';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 
 const PACKING_CATEGORY = 'packing';
 const PRETRIP_CATEGORY = 'booking';
@@ -85,6 +85,7 @@ export function OrganizationSection({
   onUploadFile,
   onDeleteFile,
 }: OrganizationSectionProps) {
+  const colors = useLandingColors();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [addingToCategory, setAddingToCategory] = useState<string | null>(null);
   const [showViewerAccess, setShowViewerAccess] = useState(false);
@@ -156,7 +157,7 @@ export function OrganizationSection({
   };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-6 w-full" style={{ backgroundColor: '#F6F5F8' }}>
+    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-6 w-full" style={{ backgroundColor: colors.background }}>
       <input
         ref={fileInputRef}
         type="file"
@@ -171,26 +172,30 @@ export function OrganizationSection({
           onClick={() => setShowViewerAccess(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-xl max-w-sm w-full p-4"
+            className="rounded-xl shadow-xl max-w-sm w-full p-4"
+            style={{ backgroundColor: colors.surface }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-slate-800">Viewer Access</h3>
+              <h3 className="font-semibold" style={{ color: colors.text }}>Viewer Access</h3>
               <button
                 type="button"
                 onClick={() => setShowViewerAccess(false)}
-                className="p-1 rounded hover:bg-slate-100 text-slate-500"
+                className="p-1 rounded transition-colors"
+                style={{ color: colors.textMuted }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <p className="text-xs text-slate-600 mb-3">
+            <p className="text-xs mb-3" style={{ color: colors.textMuted }}>
               Viewers can only view and download files. They cannot edit, delete, or upload.
             </p>
             {viewers.length === 0 ? (
-              <p className="text-sm text-slate-500 py-2">No viewers in this trip.</p>
+              <p className="text-sm py-2" style={{ color: colors.textMuted }}>No viewers in this trip.</p>
             ) : (
               <ul className="space-y-2">
                 {viewers.map((m) => {
@@ -200,8 +205,8 @@ export function OrganizationSection({
                   return (
                     <li key={m._id} className="flex items-center gap-2 py-1.5">
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden bg-slate-100"
-                        style={{ color: landingColors.primary }}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden"
+                        style={{ backgroundColor: colors.background, color: colors.primary }}
                       >
                         {u && 'avatarUrl' in u && u.avatarUrl ? (
                           <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -210,8 +215,8 @@ export function OrganizationSection({
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-800 truncate">{name}</p>
-                        {email && <p className="text-xs text-slate-500 truncate">{email}</p>}
+                        <p className="text-sm font-medium truncate" style={{ color: colors.text }}>{name}</p>
+                        {email && <p className="text-xs truncate" style={{ color: colors.textMuted }}>{email}</p>}
                       </div>
                     </li>
                   );
@@ -224,22 +229,22 @@ export function OrganizationSection({
       <div className="max-w-6xl">
         <div
           className="py-6 mb-6"
-          style={{ backgroundColor: '#F6F5F8' }}
+          style={{ backgroundColor: colors.background }}
         >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <svg className="w-4 h-4 shrink-0" style={{ color: '#a78bfa' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4 shrink-0" style={{ color: colors.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#a78bfa' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.primary }}>
                   Collaborative workspace
                 </p>
               </div>
-              <h1 className="text-3xl font-bold mb-1.5 text-slate-800">
+              <h1 className="text-3xl font-bold mb-1.5" style={{ color: colors.text }}>
                 Trip Organization & Files
               </h1>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm" style={{ color: colors.textMuted }}>
                 Manage your checklists, travel documents, and shared assets for the {tripTitle} trip.
               </p>
             </div>
@@ -251,20 +256,20 @@ export function OrganizationSection({
                   return (
                     <div
                       key={m._id}
-                      className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 border-white shadow shrink-0 overflow-hidden"
-                      style={{ marginLeft: i > 0 ? -10 : 0, zIndex: 2 - i, backgroundColor: '#e2e8f0' }}
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-medium border-2 shadow shrink-0 overflow-hidden"
+                      style={{ marginLeft: i > 0 ? -10 : 0, zIndex: 2 - i, backgroundColor: colors.border, borderColor: colors.surface }}
                       title={name}
                     >
                       {u && 'avatarUrl' in u && u.avatarUrl ? (
                         <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <span style={{ color: landingColors.primary }}>{getInitials(name)}</span>
+                        <span style={{ color: colors.primary }}>{getInitials(name)}</span>
                       )}
                     </div>
                   );
                 })}
                 {extraCount > 0 && (
-                  <span className="text-sm font-medium text-slate-600">+{extraCount}</span>
+                  <span className="text-sm font-medium" style={{ color: colors.textMuted }}>+{extraCount}</span>
                 )}
               </div>
               {canEdit && (
@@ -273,7 +278,7 @@ export function OrganizationSection({
                   onClick={() => fileInputRef.current?.click()}
                   className="h-10 px-5 rounded-2xl font-medium text-white transition-opacity hover:opacity-95 flex items-center gap-2 shrink-0"
                   style={{
-                    backgroundColor: landingColors.primary,
+                    backgroundColor: colors.primary,
                     boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
                   }}
                 >
@@ -297,24 +302,24 @@ export function OrganizationSection({
               return (
                 <div
                   key={key}
-                  className="rounded-xl bg-white p-5 shadow-sm"
-                  style={{ boxShadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)' }}
+                  className="rounded-xl p-5 shadow-sm"
+                  style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, borderStyle: 'solid' }}
                 >
                   <div className="flex items-center gap-2 mb-4">
                     <div
                       className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: '#86efac' }}
+                      style={{ backgroundColor: '#22c55e' }}
                     >
                       <span className="text-white">
                         <ChecklistIcon name={icon} />
                       </span>
                     </div>
-                    <h2 className="font-bold text-base text-slate-800">
+                    <h2 className="font-bold text-base" style={{ color: colors.text }}>
                       {title}
                     </h2>
                     <span
                       className="text-xs ml-auto px-2.5 py-1 rounded-full"
-                      style={{ backgroundColor: '#f1f5f9', color: '#64748b' }}
+                      style={{ backgroundColor: colors.background, color: colors.textMuted }}
                     >
                       {done}/{total} {key === PACKING_CATEGORY ? 'Items' : 'Done'}
                     </span>
@@ -329,7 +334,7 @@ export function OrganizationSection({
                           className="w-5 h-5 rounded flex items-center justify-center shrink-0 border-2 transition-colors"
                           style={{
                             backgroundColor: item.isCompleted ? '#10B981' : 'transparent',
-                            borderColor: item.isCompleted ? '#10B981' : '#cbd5e1',
+                            borderColor: item.isCompleted ? '#10B981' : colors.border,
                           }}
                         >
                           {item.isCompleted && (
@@ -340,7 +345,7 @@ export function OrganizationSection({
                         </button>
                         <span
                           className="flex-1 text-sm truncate"
-                          style={{ color: item.isCompleted ? '#94a3b8' : '#1e293b', textDecoration: item.isCompleted ? 'line-through' : 'none' }}
+                          style={{ color: item.isCompleted ? colors.textMuted : colors.text, textDecoration: item.isCompleted ? 'line-through' : 'none' }}
                         >
                           {item.task}
                         </span>
@@ -355,12 +360,12 @@ export function OrganizationSection({
                     ))}
                   </ul>
                   {items.length > 6 && (
-                    <p className="text-xs mt-2" style={{ color: landingColors.textMuted }}>
+                    <p className="text-xs mt-2" style={{ color: colors.textMuted }}>
                       +{items.length - 6} more
                     </p>
                   )}
                   {items.length === 0 && (
-                    <p className="text-sm" style={{ color: landingColors.textMuted }}>
+                    <p className="text-sm" style={{ color: colors.textMuted }}>
                       No items yet.
                     </p>
                   )}
@@ -381,14 +386,14 @@ export function OrganizationSection({
                           value={newChecklistTask}
                           onChange={(e) => setNewChecklistTask(e.target.value)}
                           placeholder="New task (e.g. Pack passport)"
-                          className="flex-1 min-w-0 px-3 py-2 rounded-lg border text-sm bg-white"
-                          style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                          className="flex-1 min-w-0 px-3 py-2 rounded-lg border text-sm"
+                          style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                           autoFocus
                         />
                         <button
                           type="submit"
                           className="px-4 py-2 rounded-lg text-sm font-medium text-white shrink-0"
-                          style={{ backgroundColor: landingColors.primary }}
+                          style={{ backgroundColor: colors.primary }}
                         >
                           Add
                         </button>
@@ -398,7 +403,10 @@ export function OrganizationSection({
                             setAddingToCategory(null);
                             setNewChecklistTask('');
                           }}
-                          className="px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100"
+                          className="px-3 py-2 rounded-lg text-sm transition-colors"
+                          style={{ color: colors.text }}
+                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                         >
                           Cancel
                         </button>
@@ -411,8 +419,8 @@ export function OrganizationSection({
                           setNewChecklistTask('');
                         }}
                         className="block w-full text-center text-sm font-medium mt-4 py-2"
-                        style={{ color: '#7c3aed' }}
-                      >
+style={{ color: colors.primary }}
+                        >
                         + Add New Item
                       </button>
                     )
@@ -424,62 +432,62 @@ export function OrganizationSection({
 
           <div className="space-y-4">
             <div
-              className="rounded-xl border p-4 bg-white max-h-[calc(100vh-6rem)] overflow-y-auto"
-              style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+              className="rounded-xl border p-4 max-h-[calc(100vh-6rem)] overflow-y-auto"
+              style={{ borderColor: colors.border, backgroundColor: colors.surface }}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5 text-sky-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
-                  <h2 className="font-semibold text-sm" style={{ color: landingColors.text }}>
+                  <h2 className="font-semibold text-sm" style={{ color: colors.text }}>
                     Shared File Vault
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowViewerAccess(true)}
-                  className="text-xs font-medium flex items-center gap-1.5 hover:underline"
+                  className="text-xs font-medium flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-colors"
                   style={{
-                    backgroundColor: '#F1F5F9',
-                    color: 'black',
-                    padding: '6px 12px',
-                    borderRadius: '8px',
+                    backgroundColor: colors.background,
+                    color: colors.text,
+                    borderColor: colors.border,
                   }}
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: 'black' }}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: colors.text }}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                   Viewer Access
                 </button>
               </div>
-              <p className="text-xs mb-4" style={{ color: landingColors.textMuted }}>
+              <p className="text-xs mb-4" style={{ color: colors.textMuted }}>
                 Only Admins & Editors can manage files.
               </p>
 
-              <hr className="my-4 border-t border-slate-200" />
+              <hr className="my-4 border-t" style={{ borderColor: colors.border }} />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {tripFiles.map((file) => (
                   <div
                     key={file._id}
-                    className="rounded-lg border overflow-hidden bg-white"
-                    style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                    className="rounded-lg border overflow-hidden"
+                    style={{ borderColor: colors.border, backgroundColor: colors.surface }}
                   >
-                    <div className="relative aspect-[4/3] bg-slate-100">
+                    <div className="relative aspect-[4/3]" style={{ backgroundColor: colors.background }}>
                       {isPdfFile(file.fileType, file.fileName) ? (
                         <>
-                          <div className="absolute inset-0 flex items-center justify-center bg-slate-200">
+                          <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: colors.border }}>
                             <span className="text-2xl font-medium text-white">PDF</span>
                           </div>
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); handleShare(file); }}
-                            className="absolute top-2 right-2 w-7 h-7 rounded flex items-center justify-center bg-white/80 hover:bg-white cursor-pointer transition-colors"
+                            className="absolute top-2 right-2 w-7 h-7 rounded flex items-center justify-center cursor-pointer transition-colors"
+                            style={{ backgroundColor: colors.surface }}
                             title="Share"
                           >
-                            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: colors.textMuted }}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
                           </button>
@@ -494,10 +502,11 @@ export function OrganizationSection({
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); handleShare(file); }}
-                            className="absolute top-2 right-2 w-7 h-7 rounded flex items-center justify-center bg-white/80 hover:bg-white cursor-pointer transition-colors"
+                            className="absolute top-2 right-2 w-7 h-7 rounded flex items-center justify-center cursor-pointer transition-colors"
+                            style={{ backgroundColor: colors.surface }}
                             title="Share"
                           >
-                            <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: colors.textMuted }}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                             </svg>
                           </button>
@@ -507,15 +516,15 @@ export function OrganizationSection({
                         </>
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-xl font-medium text-slate-400">Doc</span>
+                          <span className="text-xl font-medium" style={{ color: colors.textMuted }}>Doc</span>
                         </div>
                       )}
                     </div>
                     <div className="p-3">
-                      <p className="text-sm font-semibold truncate" style={{ color: landingColors.text }}>
+                      <p className="text-sm font-semibold truncate" style={{ color: colors.text }}>
                         {file.fileName}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: landingColors.textMuted }}>
+                      <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>
                         ADDED {formatAdded(file.uploadedAt).toUpperCase()} • {formatFileSize(file.fileSize)}
                       </p>
                       <div className="flex items-center justify-between gap-2 mt-2">
@@ -525,7 +534,7 @@ export function OrganizationSection({
                           target="_blank"
                           rel="noreferrer"
                           className="text-xs font-medium flex items-center gap-1 hover:underline"
-                          style={{ color: landingColors.primary }}
+                          style={{ color: colors.primary }}
                         >
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -542,9 +551,9 @@ export function OrganizationSection({
                             Delete
                           </button>
                         ) : (
-                          <span className="text-xs flex items-center gap-1" style={{ color: landingColors.textMuted }}>
+                          <span className="text-xs flex items-center gap-1" style={{ color: colors.textMuted }}>
                             No delete perm.
-                            <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: colors.textMuted }}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a2 2 0 00-2-2h-2M4 7v2a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2z" />
                             </svg>
                           </span>
@@ -562,27 +571,29 @@ export function OrganizationSection({
                   onClick={() => fileInputRef.current?.click()}
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
-                  className="mt-4 border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 transition-colors"
-                  style={{ borderColor: 'rgba(226, 232, 240, 0.9)' }}
+                  className="mt-4 border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
+                  style={{ borderColor: colors.border }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = colors.primary; e.currentTarget.style.opacity = '1'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = colors.border; e.currentTarget.style.opacity = '1'; }}
                 >
-                  <span className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 text-slate-500">
+                  <span className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.background, color: colors.textMuted }}>
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
                   </span>
-                  <span className="text-sm font-medium" style={{ color: landingColors.text }}>
+                  <span className="text-sm font-medium" style={{ color: colors.text }}>
                     Drop files to upload
                   </span>
-                  <span className="text-xs" style={{ color: landingColors.textMuted }}>
+                  <span className="text-xs" style={{ color: colors.textMuted }}>
                     Max size 20MB
                   </span>
                 </div>
               ) : (
                 <div
-                  className="mt-4 border border-dashed rounded-lg p-4 flex items-center justify-center gap-2"
-                  style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+className="mt-4 border border-dashed rounded-lg p-4 flex items-center justify-center gap-2"
+                style={{ borderColor: colors.border }}
                 >
-                  <span className="text-sm" style={{ color: landingColors.textMuted }}>
+                  <span className="text-sm" style={{ color: colors.textMuted }}>
                     Max size 20MB (upload not available for viewers)
                   </span>
                 </div>
@@ -594,12 +605,12 @@ export function OrganizationSection({
                 className="flex items-start gap-2 p-3 rounded-lg border"
                 style={{ backgroundColor: 'rgba(250, 204, 21, 0.15)', borderColor: 'rgba(250, 204, 21, 0.4)' }}
               >
-                <svg className="w-5 h-5 shrink-0 text-amber-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-5 h-5 shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
-                  <p className="text-sm font-semibold text-amber-900 mb-0.5">Role-Based Access Control</p>
-                  <p className="text-sm text-amber-800">
+                  <p className="text-sm font-semibold mb-0.5" style={{ color: colors.text }}>Role-Based Access Control</p>
+                  <p className="text-sm" style={{ color: colors.text }}>
                     You are currently logged in with Viewer permissions. You can view and download all shared files, but only the Trip Owner{(() => {
                       const owner = members.find((m) => m.role === 'owner');
                       const u = owner && typeof owner.userId === 'object' ? owner.userId : null;

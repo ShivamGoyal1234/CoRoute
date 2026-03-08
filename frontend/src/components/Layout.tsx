@@ -4,8 +4,10 @@ import { ThemeToggle } from './index';
 import { TripNotificationToaster } from './TripNotificationToaster';
 import { useAuth } from '../contexts/AuthContext';
 import { getInitials } from '../utils/helpers';
+import { useTheme } from '../contexts/ThemeContext';
 import { useLandingColors } from '../landing/theme';
-import logoImg from '../assets/logo.svg';
+import logoImg from '../assets/Logos/log.svg';
+import darkLogoImg from '../assets/Logos/dark_logo.svg';
 
 function isTripDetailPath(pathname: string): boolean {
   return /^\/trips\/[^/]+$/.test(pathname);
@@ -51,9 +53,11 @@ function NavIcon({ name }: { name: string }) {
 
 export const Layout = () => {
   const { user, logout } = useAuth();
+  const { effectiveTheme } = useTheme();
   const location = useLocation();
   const isTripBuilder = isTripDetailPath(location.pathname);
   const colors = useLandingColors();
+  const logoSrc = effectiveTheme === 'dark' ? darkLogoImg : logoImg;
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +87,7 @@ export const Layout = () => {
         >
           <div className="p-4 border-b" style={{ borderColor: colors.border }}>
             <Link to="/dashboard" className="flex items-center gap-2.5">
-              <div
-                className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
-                style={{ backgroundColor: colors.primaryHeader }}
-              >
-                <img src={logoImg} alt="" className="h-5 w-5 object-contain brightness-0 invert" />
-              </div>
-              <span className="font-bold text-lg tracking-tight" style={{ color: colors.text }}>
-                coRoute
-              </span>
+              <img src={logoSrc} alt="" className="h-16 w-24 md:h-20 md:w-48 object-contain" />
             </Link>
           </div>
           <nav className="flex-1 py-4 px-3 flex flex-col gap-0.5">
@@ -105,12 +101,12 @@ export const Layout = () => {
                     isActive ? '' : 'hover:opacity-90'}`}
                 style={({ isActive }) =>
                   isActive
-                    ? { backgroundColor: '#EBE0F9', color: colors.primaryHeader }
+                    ? { backgroundColor: '#8B5CF6', color: '#fff' }
                     : { color: colors.textMuted }}
               >
                 {({ isActive }) => (
                   <>
-                    <span style={isActive ? { color: colors.primaryHeader } : undefined}>
+                    <span style={isActive ? { color: '#fff' } : undefined}>
                       <NavIcon name={item.icon} />
                     </span>
                     {item.label}

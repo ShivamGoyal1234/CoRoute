@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import loaderImg from '../assets/Logos/loader.svg';
 
 interface LoadingProps {
   fullScreen?: boolean;
@@ -12,52 +13,23 @@ export const Loading = ({ fullScreen = false, message = 'Loading...' }: LoadingP
 
   return (
     <div className={containerClasses}>
-      <div className="relative w-24 h-24 mb-6">
+      <div className="relative w-[180px] h-[180px] mb-8 flex items-center justify-center">
         <motion.div
-          className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-        
-        <motion.div
-          className="absolute inset-2 border-4 border-secondary border-b-transparent rounded-full"
-          animate={{ rotate: -360 }}
-          transition={{
-            duration: 1.2,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-        
-        <motion.div
-          className="absolute inset-4 border-4 border-accent border-r-transparent rounded-full"
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-        
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          animate={{
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          className="absolute inset-0 flex items-center justify-center loader-glow-pulse loader-glow-wave"
         >
-          <div className="w-4 h-4 bg-success rounded-full" />
+          <motion.img
+            src={loaderImg}
+            alt=""
+            className="w-full h-full object-contain"
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: 1.2,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
         </motion.div>
       </div>
-      
       <motion.p
         className="text-lg text-app-muted font-medium"
         animate={{

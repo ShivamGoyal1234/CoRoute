@@ -1,4 +1,4 @@
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 
 interface EditBudgetModalProps {
   isOpen: boolean;
@@ -10,8 +10,6 @@ interface EditBudgetModalProps {
   onClose: () => void;
 }
 
-const inputBorder = { borderColor: 'rgba(226, 232, 240, 0.8)' };
-
 export function EditBudgetModal({
   isOpen,
   currency,
@@ -21,16 +19,17 @@ export function EditBudgetModal({
   onSave,
   onClose,
 }: EditBudgetModalProps) {
+  const colors = useLandingColors();
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <form
         onSubmit={onSave}
-        className="rounded-xl border bg-white dark:bg-slate-800 p-6 w-full max-w-md shadow-xl space-y-3"
-        style={inputBorder}
+        className="rounded-xl border p-6 w-full max-w-md shadow-xl space-y-3"
+        style={{ borderColor: colors.border, backgroundColor: colors.surface }}
       >
-        <h2 className="font-semibold text-lg" style={{ color: landingColors.text }}>
+        <h2 className="font-semibold text-lg" style={{ color: colors.text }}>
           Edit budget
         </h2>
         <div className="flex gap-3 flex-wrap">
@@ -38,7 +37,7 @@ export function EditBudgetModal({
             value={currency}
             onChange={(e) => onCurrencyChange(e.target.value)}
             className="px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           >
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
@@ -54,14 +53,14 @@ export function EditBudgetModal({
             onChange={(e) => onTotalBudgetChange(e.target.value)}
             placeholder="Total budget"
             className="flex-1 min-w-32 px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           />
         </div>
         <div className="flex gap-2 pt-2">
           <button
             type="submit"
             className="px-4 py-2 rounded-lg text-sm font-medium text-white"
-            style={{ backgroundColor: landingColors.primary }}
+            style={{ backgroundColor: colors.primary }}
           >
             Save
           </button>
@@ -69,7 +68,7 @@ export function EditBudgetModal({
             type="button"
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm border"
-            style={inputBorder}
+            style={{ borderColor: colors.border, color: colors.text }}
           >
             Cancel
           </button>

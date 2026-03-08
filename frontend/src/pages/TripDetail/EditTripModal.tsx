@@ -1,4 +1,4 @@
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 
 interface EditTripModalProps {
   isOpen: boolean;
@@ -18,8 +18,6 @@ interface EditTripModalProps {
   onClose: () => void;
 }
 
-const inputBorder = { borderColor: 'rgba(226, 232, 240, 0.8)' };
-
 export function EditTripModal({
   isOpen,
   title,
@@ -37,16 +35,17 @@ export function EditTripModal({
   onSave,
   onClose,
 }: EditTripModalProps) {
+  const colors = useLandingColors();
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <form
         onSubmit={onSave}
-        className="rounded-xl border bg-white dark:bg-slate-800 p-6 w-full max-w-md shadow-xl space-y-3 max-h-[90vh] overflow-y-auto"
-        style={inputBorder}
+        className="rounded-xl border p-6 w-full max-w-md shadow-xl space-y-3 max-h-[90vh] overflow-y-auto"
+        style={{ borderColor: colors.border, backgroundColor: colors.surface }}
       >
-        <h2 className="font-semibold text-lg" style={{ color: landingColors.text }}>Edit trip</h2>
+        <h2 className="font-semibold text-lg" style={{ color: colors.text }}>Edit trip</h2>
         <input
           type="text"
           value={title}
@@ -54,7 +53,7 @@ export function EditTripModal({
           placeholder="Trip title"
           required
           className="w-full px-3 py-2 rounded-lg border text-sm"
-          style={inputBorder}
+          style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
         />
         <div>
           <input
@@ -63,9 +62,9 @@ export function EditTripModal({
             onChange={(e) => onDestinationChange(e.target.value)}
             placeholder="Where are you going? (city, country or region)"
             className="w-full px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           />
-          <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+          <p className="text-xs mt-1" style={{ color: colors.textMuted }}>
             Used for the map on dashboard and trip detail.
           </p>
         </div>
@@ -76,7 +75,7 @@ export function EditTripModal({
             onChange={(e) => onStartDateChange(e.target.value)}
             required
             className="px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           />
           <input
             type="date"
@@ -84,7 +83,7 @@ export function EditTripModal({
             onChange={(e) => onEndDateChange(e.target.value)}
             required
             className="px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           />
         </div>
         <div className="flex gap-3 flex-wrap">
@@ -92,7 +91,7 @@ export function EditTripModal({
             value={currency}
             onChange={(e) => onCurrencyChange(e.target.value)}
             className="px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           >
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
@@ -108,14 +107,14 @@ export function EditTripModal({
             onChange={(e) => onTotalBudgetChange(e.target.value)}
             placeholder="Total budget"
             className="w-32 px-3 py-2 rounded-lg border text-sm"
-            style={inputBorder}
+            style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
           />
         </div>
         <div className="flex gap-2 pt-2">
-          <button type="submit" className="px-4 py-2 rounded-lg text-sm font-medium text-white" style={{ backgroundColor: landingColors.primary }}>
+          <button type="submit" className="px-4 py-2 rounded-lg text-sm font-medium text-white" style={{ backgroundColor: colors.primary }}>
             Save
           </button>
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm border" style={inputBorder}>
+          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm border" style={{ borderColor: colors.border, color: colors.text }}>
             Cancel
           </button>
         </div>

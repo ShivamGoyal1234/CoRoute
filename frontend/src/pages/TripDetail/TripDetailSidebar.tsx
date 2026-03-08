@@ -1,7 +1,7 @@
 import { SIDEBAR_NAV } from './types';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 import type { SectionId } from './types';
 
 function NavIcon({ name }: { name: string }) {
@@ -48,16 +48,17 @@ interface TripDetailSidebarProps {
   presenceSectionLabels?: Record<string, string>;
 }
 
-const PRESENCE_COLORS = [landingColors.primary, '#38BDF8', '#10B981', '#F59E0B'];
+const PRESENCE_COLORS = ['#8B5CF6', '#38BDF8', '#10B981', '#F59E0B'];
 
 export function TripDetailSidebar({ section, onSectionChange, presenceSectionLabels = {} }: TripDetailSidebarProps) {
+  const colors = useLandingColors();
   const { presence } = useSocket();
   const { user } = useAuth();
   const otherUsers = presence.filter((p) => p.userId !== user?.id);
   return (
     <aside
       className="w-52 shrink-0 flex flex-col border-r py-4"
-      style={{ borderColor: 'rgba(226, 232, 240, 0.8)', backgroundColor: '#fff' }}
+      style={{ borderColor: colors.border, backgroundColor: colors.surface }}
     >
       <nav className="px-3 space-y-0.5">
         {SIDEBAR_NAV.map((item) => (
@@ -67,8 +68,8 @@ export function TripDetailSidebar({ section, onSectionChange, presenceSectionLab
             onClick={() => onSectionChange(item.id)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
             style={{
-              backgroundColor: section === item.id ? '#7859F8' : 'transparent',
-              color: section === item.id ? '#fff' : landingColors.textMuted,
+              backgroundColor: section === item.id ? colors.primary : 'transparent',
+              color: section === item.id ? '#fff' : colors.textMuted,
             }}
           >
             <span style={section === item.id ? { color: '#fff' } : undefined}>
@@ -78,8 +79,8 @@ export function TripDetailSidebar({ section, onSectionChange, presenceSectionLab
           </button>
         ))}
       </nav>
-      <div className="mt-auto px-3 pt-4 border-t" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: landingColors.textMuted }}>
+      <div className="mt-auto px-3 pt-4 border-t" style={{ borderColor: colors.border }}>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.textMuted }}>
           Live presence
         </p>
         <ul className="space-y-2">
@@ -90,13 +91,13 @@ export function TripDetailSidebar({ section, onSectionChange, presenceSectionLab
                   className="w-2 h-2 rounded-full shrink-0"
                   style={{ backgroundColor: PRESENCE_COLORS[i % PRESENCE_COLORS.length] }}
                 />
-                <span style={{ color: landingColors.text }}>
+                <span style={{ color: colors.text }}>
                   {p.userName} in {presenceSectionLabels[p.section] ?? p.section}
                 </span>
               </li>
             ))
           ) : (
-            <li className="text-sm" style={{ color: landingColors.textMuted }}>
+            <li className="text-sm" style={{ color: colors.textMuted }}>
               No one else viewing
             </li>
           )}

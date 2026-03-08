@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Logo, ThemeToggle } from '../components';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useLandingColors } from '../landing/theme';
-import logoImg from '../assets/logo.svg';
+import logoImg from '../assets/Logos/log.svg';
+import darkLogoImg from '../assets/Logos/dark_logo.svg';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_AVATAR_SIZE_MB = 2;
@@ -42,6 +44,7 @@ const features = (colors: ReturnType<typeof useLandingColors>) => [
 
 export default function Register() {
   const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -143,15 +146,7 @@ export default function Register() {
             }}
           >
         <Link to="/" className="flex items-center gap-2 w-fit">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: colors.success }}
-          >
-            <img src={logoImg} alt="" className="h-5 w-5 object-contain brightness-0 invert" />
-          </div>
-          <span className="font-bold text-lg tracking-tight" style={{ color: colors.text }}>
-            coRoute
-          </span>
+          <img src={effectiveTheme === 'dark' ? darkLogoImg : logoImg} alt="" className="h-16 w-24 md:h-20 md:w-48 object-contain flex-shrink-0" />
         </Link>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -216,11 +211,12 @@ export default function Register() {
             Join thousands of travelers planning better.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="register-form space-y-5">
+            <style>{`.register-form input::placeholder { color: ${colors.textMuted}; }.register-form input[type="email"]:focus,.register-form input[type="password"]:focus,.register-form input[type="text"]:focus { border-color: #8B5CF6 !important; background-color: ${colors.surface} !important; }`}</style>
             {error && (
               <div
                 className="p-3 rounded-lg text-sm"
-                style={{ backgroundColor: '#FEF2F2', color: '#B91C1C' }}
+                style={{ backgroundColor: effectiveTheme === 'dark' ? 'rgba(185, 28, 28, 0.25)' : '#FEF2F2', color: effectiveTheme === 'dark' ? '#FCA5A5' : '#B91C1C' }}
               >
                 {error}
               </div>
@@ -232,7 +228,7 @@ export default function Register() {
               </label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: colors.textMuted }} aria-hidden>
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -243,7 +239,8 @@ export default function Register() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     readOnly={otpSent}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow disabled:bg-slate-50 disabled:text-slate-600"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow disabled:opacity-70"
+                    style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                     placeholder="name@company.com"
                   />
                 </div>
@@ -279,7 +276,8 @@ export default function Register() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     required
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                    className="w-full px-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow"
+                    style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                     placeholder="000000"
                     maxLength={6}
                   />
@@ -290,7 +288,7 @@ export default function Register() {
                     Full Name
                   </label>
                   <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: colors.textMuted }} aria-hidden>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -300,7 +298,8 @@ export default function Register() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow"
+                  style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                   placeholder="John Doe"
                 />
                   </div>
@@ -320,13 +319,13 @@ export default function Register() {
                 />
                 <label
                   htmlFor="profile-pic-input"
-                  className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-dashed border-slate-300 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/5 transition-colors overflow-hidden"
-                  style={{ borderColor: profilePicPreview ? 'transparent' : undefined }}
+                  className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer hover:border-[#8B5CF6] hover:bg-[#8B5CF6]/5 transition-colors overflow-hidden"
+                  style={{ borderColor: profilePicPreview ? 'transparent' : colors.border, backgroundColor: colors.headerBg }}
                 >
                   {profilePicPreview ? (
                     <img src={profilePicPreview} alt="Preview" className="w-full h-full object-cover" />
                   ) : (
-                    <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-7 h-7" style={{ color: colors.textMuted }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   )}
@@ -357,7 +356,7 @@ export default function Register() {
                     Password
                   </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: colors.textMuted }} aria-hidden>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
@@ -368,7 +367,8 @@ export default function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={8}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow"
+                  style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                   placeholder="••••••••"
                 />
               </div>
@@ -398,17 +398,18 @@ export default function Register() {
           </form>
 
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-slate-200" />
+            <div className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
             <span className="text-xs font-medium uppercase tracking-wider" style={{ color: colors.textMuted }}>
               Or continue with
             </span>
-            <div className="flex-1 h-px bg-slate-200" />
+            <div className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
           </div>
 
           <div className="flex gap-3">
             <button
               type="button"
-              className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 rounded-xl border font-medium transition-colors flex items-center justify-center gap-2"
+              style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -420,7 +421,8 @@ export default function Register() {
             </button>
             <button
               type="button"
-              className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-2.5 rounded-xl border font-medium transition-colors flex items-center justify-center gap-2"
+              style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13 2.9 1.19 4.04-.95 4.04-.95-.03-.02 2.31-1.4 2.31-4.22-.02-2.8-2.28-4.66-4.32-4.69-1.36-.02-2.64.47-3.68 1.32-.52-.3-1.2-.5-1.9-.5-2.07 0-3.75 1.68-3.75 3.75 0 1.44.77 2.71 1.92 3.42-.07.24-.15.5-.15.78 0 2.06 1.67 3.73 3.73 3.73 2.06 0 3.73-1.67 3.73-3.73 0-.28-.02-.54-.07-.78 1.15-.71 1.92-1.98 1.92-3.42 0-2.07-1.68-3.75-3.75-3.75-.7 0-1.38.2-1.98.54-.98-.78-2.24-1.25-3.58-1.25z" />

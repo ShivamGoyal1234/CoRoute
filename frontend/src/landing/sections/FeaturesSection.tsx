@@ -12,20 +12,20 @@ export function FeaturesSection({ colors }: { colors: ReturnType<typeof useLandi
           initial={skip ? false : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-center mb-4"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 px-2"
           style={{ color: colors.text }}
         >
-          Everything You Need for Your Next <br /> Adventure
+          Everything You Need for Your Next <br className="hidden sm:block" /> Adventure
         </motion.h2>
         <motion.p
           initial={skip ? false : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center max-w-2xl mx-auto mb-12"
+          className="text-center max-w-2xl mx-auto mb-10 sm:mb-12 px-2 text-sm sm:text-base"
           style={{ color: colors.textMuted }}
         >
-          We've built the most comprehensive toolkit for travelers who love to <br />
-          coordinate without the stress of messy group chats.
+          We've built the most comprehensive toolkit for travelers who love to
+          <br className="hidden sm:block" /> coordinate without the stress of messy group chats.
         </motion.p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (

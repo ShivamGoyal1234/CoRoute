@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { TripCardMap, type MapCenter } from './TripCardMap';
 import { formatDateRangeShort, getInitials } from '../utils/helpers';
 import type { Trip } from '../types';
-import { landingColors } from '../landing/theme';
+import { useLandingColors } from '../landing/theme';
 
 const AVATAR_COLORS = ['#E2E8F0', '#FED7AA', '#A78B71', '#94A3B8', '#B8E0D2'];
 
@@ -23,11 +23,13 @@ interface TripCardProps {
   members?: TripCardMember[];
 }
 
-const statusConfig: Record<TripStatus, { label: string; bg: string }> = {
-  upcoming: { label: 'UPCOMING', bg: landingColors.primary },
-  planning: { label: 'PLANNING', bg: landingColors.secondary },
-  completed: { label: 'COMPLETED', bg: landingColors.success },
-};
+function getStatusConfig(primary: string, secondary: string, success: string): Record<TripStatus, { label: string; bg: string }> {
+  return {
+    upcoming: { label: 'UPCOMING', bg: primary },
+    planning: { label: 'PLANNING', bg: secondary },
+    completed: { label: 'COMPLETED', bg: success },
+  };
+}
 
 function CalendarIcon({ className }: { className?: string }) {
   return (
@@ -56,6 +58,8 @@ export function TripCard({
   memberCount = 1,
   members = [],
 }: TripCardProps) {
+  const colors = useLandingColors();
+  const statusConfig = getStatusConfig(colors.primary, colors.secondary, colors.success);
   const { label: statusLabel, bg: statusBg } = statusConfig[status];
   const displayCount = memberCount > 0 ? memberCount : 1;
   const maxAvatars = 3;
@@ -65,8 +69,9 @@ export function TripCard({
   return (
     <Link
       to={`/trips/${trip._id}`}
-      className="block rounded-xl overflow-hidden bg-white transition-all hover:shadow-lg"
+      className="block rounded-xl overflow-hidden transition-all hover:shadow-lg"
       style={{
+        backgroundColor: colors.surface,
         boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06), 0 4px 12px -2px rgba(0,0,0,0.06)',
       }}
     >
@@ -88,15 +93,17 @@ export function TripCard({
       <div className="p-4">
         <h2
           className="text-lg font-bold truncate"
-          style={{ color: landingColors.text }}
+          style={{ color: colors.text }}
         >
           {trip.title}
         </h2>
         <p
           className="flex items-center gap-1.5 text-sm mt-1.5"
-          style={{ color: landingColors.textMuted }}
+          style={{ color: colors.textMuted }}
         >
-          <CalendarIcon className="w-4 h-4 shrink-0" />
+          <span style={{ color: colors.textMuted }}>
+            <CalendarIcon className="w-4 h-4 shrink-0" />
+          </span>
           {formatDateRangeShort(trip.startDate, trip.endDate)}
         </p>
 
@@ -107,10 +114,11 @@ export function TripCard({
                 {visibleMembers.map((m, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden bg-slate-100"
+                    className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden"
                     style={{
                       backgroundColor: AVATAR_COLORS[i % AVATAR_COLORS.length],
-                      color: landingColors.text,
+                      color: colors.text,
+                      borderColor: colors.surface,
                     }}
                     title={m.name}
                   >
@@ -127,8 +135,8 @@ export function TripCard({
                 ))}
                 {extraCount > 0 && (
                   <div
-                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-semibold text-white shrink-0"
-                    style={{ backgroundColor: landingColors.primary }}
+                    className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-semibold text-white shrink-0"
+                    style={{ backgroundColor: colors.primary, borderColor: colors.surface }}
                   >
                     +{extraCount}
                   </div>
@@ -137,18 +145,19 @@ export function TripCard({
             ) : (
               <>
                 <div
-                  className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-medium shrink-0"
+                  className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-medium shrink-0"
                   style={{
                     backgroundColor: AVATAR_COLORS[0],
-                    color: landingColors.text,
+                    color: colors.text,
+                    borderColor: colors.surface,
                   }}
                 >
                   ?
                 </div>
                 {displayCount > 1 && (
                   <div
-                    className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-xs font-semibold text-white shrink-0"
-                    style={{ backgroundColor: landingColors.primary }}
+                    className="w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-semibold text-white shrink-0"
+                    style={{ backgroundColor: colors.primary, borderColor: colors.surface }}
                   >
                     +{displayCount - 1}
                   </div>
@@ -158,7 +167,7 @@ export function TripCard({
           </div>
           <span
             className="text-sm font-semibold shrink-0"
-            style={{ color: '#8B5CF6' }}
+            style={{ color: colors.primary }}
           >
             {displayCount} Traveler{displayCount !== 1 ? 's' : ''}
           </span>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getInitials } from '../utils/helpers';
-import { landingColors } from '../landing/theme';
+import { useLandingColors } from '../landing/theme';
 import { tripsApi, membersApi } from '../lib/api';
 import type { Trip, Membership, MemberRole } from '../types';
 
@@ -16,9 +16,8 @@ interface FeedItem {
   timestamp: string;
 }
 
-function ActivityIcon({ type }: { type: string }) {
+function ActivityIcon({ type, color }: { type: string; color: string }) {
   const className = 'w-4 h-4 shrink-0';
-  const color = landingColors.primary;
   const iconMap: Record<string, React.ReactNode> = {
     edit: (
       <svg className={className} style={{ color }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -61,6 +60,7 @@ function formatFeedTime(iso: string): string {
 
 export default function Settings() {
   const { user } = useAuth();
+  const colors = useLandingColors();
   const [searchParams, setSearchParams] = useSearchParams();
   const tripIdFromUrl = searchParams.get('tripId');
 
@@ -195,8 +195,8 @@ export default function Settings() {
 
   if (loading && !selectedTripId) {
     return (
-      <div className="max-w-4xl mx-auto rounded-2xl border overflow-hidden flex items-center justify-center min-h-[200px]" style={{ backgroundColor: landingColors.surface, borderColor: landingColors.border }}>
-        <p style={{ color: landingColors.textMuted }}>Loading…</p>
+      <div className="max-w-4xl mx-auto rounded-2xl border overflow-hidden flex items-center justify-center min-h-[200px]" style={{ backgroundColor: colors.surface, borderColor: colors.border }}>
+        <p style={{ color: colors.textMuted }}>Loading…</p>
       </div>
     );
   }
@@ -204,22 +204,22 @@ export default function Settings() {
   return (
     <div
       className="max-w-4xl mx-auto rounded-2xl border overflow-hidden"
-      style={{ backgroundColor: landingColors.surface, borderColor: landingColors.border }}
+      style={{ backgroundColor: colors.surface, borderColor: colors.border }}
     >
       <div className="p-8">
-        <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: landingColors.textMuted }}>
+        <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: colors.textMuted }}>
           Project Workspace
         </p>
-        <h1 className="text-2xl font-bold tracking-tight mb-1" style={{ color: landingColors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <h1 className="text-2xl font-bold tracking-tight mb-1" style={{ color: colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           Collaboration & Permissions
         </h1>
-        <p className="text-sm mb-4" style={{ color: landingColors.textMuted }}>
+        <p className="text-sm mb-4" style={{ color: colors.textMuted }}>
           Invite travelers and monitor real-time activity for your trips.
         </p>
 
         {trips.length > 0 && (
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-1.5" style={{ color: landingColors.text }}>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
               Select trip
             </label>
             <select
@@ -227,9 +227,9 @@ export default function Settings() {
               onChange={(e) => handleTripChange(e.target.value)}
               className="w-full max-w-sm px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2"
               style={{
-                borderColor: landingColors.border,
-                backgroundColor: landingColors.background,
-                color: landingColors.text,
+                borderColor: colors.border,
+                backgroundColor: colors.background,
+                color: colors.text,
               }}
             >
               <option value="">Choose a trip…</option>
@@ -243,13 +243,13 @@ export default function Settings() {
         )}
 
         {!selectedTripId && (
-          <p className="text-sm py-4" style={{ color: landingColors.textMuted }}>
+          <p className="text-sm py-4" style={{ color: colors.textMuted }}>
             Select a trip above to manage members and view activity.
           </p>
         )}
 
         {selectedTripId && loadingTrip && (
-          <p className="text-sm py-4" style={{ color: landingColors.textMuted }}>
+          <p className="text-sm py-4" style={{ color: colors.textMuted }}>
             Loading…
           </p>
         )}
@@ -259,7 +259,7 @@ export default function Settings() {
             <div className="space-y-8">
               {canManageAccess && (
                 <section>
-                  <h2 className="text-sm font-semibold mb-3" style={{ color: landingColors.text }}>
+                  <h2 className="text-sm font-semibold mb-3" style={{ color: colors.text }}>
                     Invite Travelers
                   </h2>
                   <div className="flex flex-wrap gap-2">
@@ -270,9 +270,9 @@ export default function Settings() {
                       onChange={(e) => { setEmail(e.target.value); setInviteError(''); }}
                       className="flex-1 min-w-[200px] px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2"
                       style={{
-                        borderColor: inviteError ? '#dc2626' : landingColors.border,
-                        backgroundColor: landingColors.background,
-                        color: landingColors.text,
+                        borderColor: inviteError ? '#dc2626' : colors.border,
+                        backgroundColor: colors.background,
+                        color: colors.text,
                       }}
                     />
                     <select
@@ -280,9 +280,9 @@ export default function Settings() {
                       onChange={(e) => setRole(e.target.value as RoleOption)}
                       className="px-4 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2"
                       style={{
-                        borderColor: landingColors.border,
-                        backgroundColor: landingColors.background,
-                        color: landingColors.text,
+                        borderColor: colors.border,
+                        backgroundColor: colors.background,
+                        color: colors.text,
                       }}
                     >
                       <option value="Editor">Editor</option>
@@ -294,7 +294,7 @@ export default function Settings() {
                       onClick={handleInvite}
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-white transition-opacity hover:opacity-95 disabled:opacity-60"
                       style={{
-                        backgroundColor: landingColors.primary,
+                        backgroundColor: colors.primary,
                         boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
                       }}
                     >
@@ -313,7 +313,7 @@ export default function Settings() {
               )}
 
               <section>
-                <h2 className="text-sm font-semibold mb-3" style={{ color: landingColors.text }}>
+                <h2 className="text-sm font-semibold mb-3" style={{ color: colors.text }}>
                   Manage Access
                 </h2>
                 <ul className="space-y-3">
@@ -321,11 +321,11 @@ export default function Settings() {
                     <li
                       key={m._id}
                       className="flex items-center gap-3 py-2.5 px-3 rounded-xl"
-                      style={{ backgroundColor: landingColors.background }}
+                      style={{ backgroundColor: colors.background }}
                     >
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium shrink-0 overflow-hidden"
-                        style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primaryHeader }}
+                        style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primaryHeader }}
                       >
                         {m.isYou && user?.avatarUrl ? (
                           <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -336,15 +336,15 @@ export default function Settings() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate" style={{ color: landingColors.text }}>
+                        <p className="text-sm font-medium truncate" style={{ color: colors.text }}>
                           {m.name}
                           {m.isYou && (
-                            <span className="ml-1.5 text-xs font-normal" style={{ color: landingColors.textMuted }}>
+                            <span className="ml-1.5 text-xs font-normal" style={{ color: colors.textMuted }}>
                               (You)
                             </span>
                           )}
                         </p>
-                        <p className="text-xs truncate" style={{ color: landingColors.textMuted }}>
+                        <p className="text-xs truncate" style={{ color: colors.textMuted }}>
                           {m.email}
                         </p>
                       </div>
@@ -352,7 +352,7 @@ export default function Settings() {
                         className="text-xs font-medium px-2.5 py-1 rounded-md shrink-0"
                         style={{
                           backgroundColor: m.isOwner ? 'rgba(139, 92, 246, 0.15)' : 'rgba(100, 116, 139, 0.15)',
-                          color: m.isOwner ? landingColors.primaryHeader : landingColors.textMuted,
+                          color: m.isOwner ? colors.primaryHeader : colors.textMuted,
                         }}
                       >
                         {m.role}
@@ -363,7 +363,7 @@ export default function Settings() {
                           disabled={removingId === m._id}
                           onClick={() => handleRemove(m._id)}
                           className="p-2 rounded-lg transition-opacity hover:opacity-80 disabled:opacity-50"
-                          style={{ color: landingColors.textMuted }}
+                          style={{ color: colors.textMuted }}
                           aria-label={`Remove ${m.name}`}
                         >
                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -379,7 +379,7 @@ export default function Settings() {
 
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold flex items-center gap-2" style={{ color: landingColors.text }}>
+                <h2 className="text-sm font-semibold flex items-center gap-2" style={{ color: colors.text }}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -388,24 +388,24 @@ export default function Settings() {
               </div>
               <div
                 className="rounded-xl border p-4 space-y-4 max-h-[320px] overflow-y-auto"
-                style={{ borderColor: landingColors.border, backgroundColor: landingColors.background }}
+                style={{ borderColor: colors.border, backgroundColor: colors.background }}
               >
                 {feed.length === 0 ? (
-                  <p className="text-sm" style={{ color: landingColors.textMuted }}>
+                  <p className="text-sm" style={{ color: colors.textMuted }}>
                     No activity yet.
                   </p>
                 ) : (
                   feed.map((a, i) => (
                     <div key={`${a.timestamp}-${i}`} className="flex gap-3">
                       <div className="mt-0.5 shrink-0">
-                        <ActivityIcon type={a.type} />
+                        <ActivityIcon type={a.type} color={colors.primary} />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm" style={{ color: landingColors.text }}>
+                        <p className="text-sm" style={{ color: colors.text }}>
                           <span className="font-medium">{a.userName}</span> {a.text}
-                          {a.detail && <span className="text-xs" style={{ color: landingColors.textMuted }}> — {a.detail}</span>}
+                          {a.detail && <span className="text-xs" style={{ color: colors.textMuted }}> — {a.detail}</span>}
                         </p>
-                        <p className="text-xs mt-0.5" style={{ color: landingColors.textMuted }}>
+                        <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>
                           {formatFeedTime(a.timestamp)}
                         </p>
                       </div>
@@ -416,7 +416,7 @@ export default function Settings() {
                   <Link
                     to={`/trips/${trip._id}`}
                     className="text-sm font-medium w-full pt-2 border-t block text-center"
-                    style={{ color: landingColors.primary, borderColor: landingColors.border }}
+                    style={{ color: colors.primary, borderColor: colors.border }}
                   >
                     View trip
                   </Link>
@@ -426,11 +426,11 @@ export default function Settings() {
           </div>
         )}
 
-        <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t" style={{ borderColor: landingColors.border }}>
+        <div className="flex items-center justify-end gap-3 mt-8 pt-6 border-t" style={{ borderColor: colors.border }}>
           <Link
             to={selectedTripId ? `/trips/${selectedTripId}` : '/dashboard'}
             className="px-4 py-2.5 rounded-xl text-sm font-medium transition-opacity hover:opacity-90"
-            style={{ color: landingColors.textMuted }}
+            style={{ color: colors.textMuted }}
           >
             {selectedTripId ? 'Back to trip' : 'Cancel'}
           </Link>
@@ -438,7 +438,7 @@ export default function Settings() {
             to="/dashboard"
             className="px-5 py-2.5 rounded-xl font-medium text-white transition-opacity hover:opacity-95"
             style={{
-              backgroundColor: landingColors.primary,
+              backgroundColor: colors.primary,
               boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
             }}
           >

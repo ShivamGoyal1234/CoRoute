@@ -5,7 +5,8 @@ import { tripsApi } from '../lib/api';
 import type { Trip } from '../types';
 import { Loading } from '../components/Loading';
 import { TripCard } from '../components/TripCard';
-import { landingColors } from '../landing/theme';
+import { useTheme } from '../contexts/ThemeContext';
+import { useLandingColors } from '../landing/theme';
 
 type TabId = 'upcoming' | 'planning' | 'completed';
 
@@ -19,6 +20,8 @@ function getTripStatus(trip: Trip): TabId {
 }
 
 export default function SharedPage() {
+  const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -45,8 +48,12 @@ export default function SharedPage() {
   if (error) {
     return (
       <div
-        className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700"
-        style={{ backgroundColor: '#FEF2F2' }}
+        className="rounded-xl border p-4"
+        style={{
+          backgroundColor: effectiveTheme === 'dark' ? 'rgba(185, 28, 28, 0.25)' : '#FEF2F2',
+          color: effectiveTheme === 'dark' ? '#FCA5A5' : '#B91C1C',
+          borderColor: effectiveTheme === 'dark' ? 'rgba(248, 113, 113, 0.3)' : '#FECACA',
+        }}
       >
         {error}
       </div>
@@ -59,28 +66,31 @@ export default function SharedPage() {
     { id: 'completed', label: 'Completed' },
   ];
 
+  const emptyCardBg = effectiveTheme === 'dark' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(236, 229, 249, 0.6)';
+  const emptyCardBorder = effectiveTheme === 'dark' ? 'rgba(139, 92, 246, 0.4)' : 'rgba(139, 92, 246, 0.4)';
+
   return (
     <div
       className="min-h-screen rounded-2xl"
-      style={{ backgroundColor: landingColors.background }}
+      style={{ backgroundColor: colors.background }}
     >
       <div className="flex flex-col gap-6">
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            style={{ color: landingColors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            style={{ color: colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Shared with Me
           </h1>
           <p
             className="text-sm mt-1"
-            style={{ color: landingColors.textMuted }}
+            style={{ color: colors.textMuted }}
           >
             Trips others have shared with you.
           </p>
         </div>
 
-        <nav className="flex gap-6 border-b border-slate-200/80" style={{ borderColor: 'rgba(100, 116, 139, 0.2)' }}>
+        <nav className="flex gap-6 border-b" style={{ borderColor: colors.border }}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -88,8 +98,8 @@ export default function SharedPage() {
               onClick={() => setActiveTab(tab.id)}
               className="pb-3 text-sm font-medium transition-colors -mb-px"
               style={{
-                color: activeTab === tab.id ? landingColors.text : landingColors.textMuted,
-                borderBottom: activeTab === tab.id ? `2px solid ${landingColors.primary}` : '2px solid transparent',
+                color: activeTab === tab.id ? colors.text : colors.textMuted,
+                borderBottom: activeTab === tab.id ? `2px solid ${colors.primary}` : '2px solid transparent',
               }}
             >
               {tab.label}
@@ -103,18 +113,18 @@ export default function SharedPage() {
             animate={{ opacity: 1 }}
             className="rounded-2xl border-2 border-dashed p-12 text-center"
             style={{
-              borderColor: 'rgba(139, 92, 246, 0.4)',
-              backgroundColor: 'rgba(236, 229, 249, 0.6)',
+              borderColor: emptyCardBorder,
+              backgroundColor: emptyCardBg,
             }}
           >
-            <p className="mb-4" style={{ color: landingColors.textMuted }}>
+            <p className="mb-4" style={{ color: colors.textMuted }}>
               No trips shared with you yet. When someone invites you to a trip, it will appear here.
             </p>
             <Link
               to="/dashboard"
               className="inline-flex px-5 py-2.5 rounded-xl font-medium text-white transition-opacity hover:opacity-95"
               style={{
-                backgroundColor: landingColors.primary,
+                backgroundColor: colors.primary,
                 boxShadow: '0 8px 24px 0 rgba(139, 92, 246, 0.3)',
               }}
             >

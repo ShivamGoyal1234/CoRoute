@@ -5,7 +5,7 @@ import { formatTime, getInitials } from '../../utils/helpers';
 import { attachmentUrl, activitiesApi, commentsApi } from '../../lib/api';
 import { useSocket, type TypingUser } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 
 const TYPING_DEBOUNCE_MS = 400;
 
@@ -34,6 +34,7 @@ export function ActivityTimelineCard({
   showDragHandle,
   useRealtimeTyping,
 }: ActivityTimelineCardProps) {
+  const colors = useLandingColors();
   const { typingByActivity, onCommentNew, emitTypingStart, emitTypingStop } = useSocket();
   const { user } = useAuth();
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -111,19 +112,19 @@ export function ActivityTimelineCard({
   return (
     <motion.div layout className="relative flex gap-4 pb-6">
       <div
-        className="absolute left-0 w-6 h-6 rounded-full border-2 border-white shadow flex items-center justify-center text-xs font-medium -translate-x-[5px]"
-        style={{ backgroundColor: landingColors.primary, color: '#fff' }}
+        className="absolute left-0 w-6 h-6 rounded-full border-2 shadow flex items-center justify-center text-xs font-medium -translate-x-[5px]"
+        style={{ borderColor: colors.surface, backgroundColor: colors.primary, color: '#fff' }}
       >
         {index + 1}
       </div>
       <div
-        className="flex-1 flex flex-col rounded-xl border overflow-hidden cursor-pointer transition-shadow hover:shadow-md bg-white shadow-sm"
-        style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+        className="flex-1 flex flex-col rounded-xl border overflow-hidden cursor-pointer transition-shadow hover:shadow-md shadow-sm"
+        style={{ borderColor: colors.border, backgroundColor: colors.surface }}
         onClick={onOpenDetail}
       >
         <div className="flex items-stretch min-h-0 pt-4 pl-4">
           {imageSrc && (
-            <div className="w-36 sm:w-44 shrink-0 bg-slate-100 rounded-xl overflow-hidden self-stretch">
+            <div className="w-36 sm:w-44 shrink-0 rounded-xl overflow-hidden self-stretch" style={{ backgroundColor: colors.background }}>
               <img src={imageSrc} alt="" className="w-full h-full min-h-[140px] object-cover" />
             </div>
           )}
@@ -131,25 +132,27 @@ export function ActivityTimelineCard({
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1 flex flex-wrap items-baseline gap-2">
                 {showDragHandle && (
-                  <span className="text-slate-400 shrink-0 select-none" title="Drag to reorder" aria-hidden>
+                  <span className="shrink-0 select-none" style={{ color: colors.textMuted }} title="Drag to reorder" aria-hidden>
                     ⋮⋮
                   </span>
                 )}
                 {activity.startTime && (
                   <span
                     className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold shrink-0"
-                    style={{ backgroundColor: '#F1EEFE', color: '#7859F8' }}
+                    style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                   >
                     {formatTime(activity.startTime)}
                   </span>
                 )}
-                <h3 className="font-bold text-black text-lg">{activity.title}</h3>
+                <h3 className="font-bold text-lg" style={{ color: colors.text }}>{activity.title}</h3>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <button
                   type="button"
-                  className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-0.5"
-                  style={{ color: '#38BDF8' }}
+                  className="p-1.5 rounded flex items-center gap-0.5"
+                  style={{ backgroundColor: 'transparent', color: colors.accent }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (onOpenChat) onOpenChat(activity._id);
@@ -161,10 +164,10 @@ export function ActivityTimelineCard({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   {(activity.commentCount ?? 0) > 0 && (
-                    <span className="text-xs font-medium text-slate-600">{activity.commentCount ?? 0}</span>
+                    <span className="text-xs font-medium" style={{ color: colors.textMuted }}>{activity.commentCount ?? 0}</span>
                   )}
                 </button>
-                <button type="button" className="p-1.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500" aria-label="More options">
+                <button type="button" className="p-1.5 rounded" style={{ color: colors.textMuted }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }} aria-label="More options">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                   </svg>
@@ -172,11 +175,11 @@ export function ActivityTimelineCard({
               </div>
             </div>
             {activity.description && (
-              <p className="text-sm mt-2 text-slate-600 dark:text-slate-400 line-clamp-2">{activity.description}</p>
+              <p className="text-sm mt-2 line-clamp-2" style={{ color: colors.textMuted }}>{activity.description}</p>
             )}
             {activity.location && (
-              <p className="text-sm mt-1.5 flex items-center gap-1.5 text-black/80">
-                <svg className="w-4 h-4 shrink-0" style={{ color: '#111' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <p className="text-sm mt-1.5 flex items-center gap-1.5" style={{ color: colors.textMuted }}>
+                <svg className="w-4 h-4 shrink-0" style={{ color: colors.textMuted }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -187,19 +190,22 @@ export function ActivityTimelineCard({
         </div>
         {isDiscussionOpen ? (
           <div
-            className="px-4 py-3 border-t bg-slate-50/80"
-            style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+            className="px-4 py-3 border-t"
+            style={{ borderColor: colors.border, backgroundColor: colors.background }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: landingColors.textMuted }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.textMuted }}>
                 Comments
               </span>
               {onCloseDiscussion && (
                 <button
                   type="button"
                   onClick={onCloseDiscussion}
-                  className="p-1 rounded hover:bg-slate-200 text-slate-500"
+                  className="p-1 rounded"
+                  style={{ color: colors.textMuted }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                   aria-label="Close"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -209,7 +215,7 @@ export function ActivityTimelineCard({
               )}
             </div>
             {commentsLoading ? (
-              <p className="text-xs" style={{ color: landingColors.textMuted }}>Loading comments…</p>
+              <p className="text-xs" style={{ color: colors.textMuted }}>Loading comments…</p>
             ) : (
               <>
                 <ul className="space-y-2 max-h-32 overflow-y-auto mb-3">
@@ -220,13 +226,13 @@ export function ActivityTimelineCard({
                       <li key={c._id} className="flex items-start gap-2">
                         <span
                           className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center text-xs font-medium"
-                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+                          style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                         >
                           {author ? getInitials((author as { name?: string }).name ?? '') : '?'}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm" style={{ color: landingColors.text }}>{c.content}</p>
-                          <p className="text-xs" style={{ color: landingColors.textMuted }}>
+                          <p className="text-sm" style={{ color: colors.text }}>{c.content}</p>
+                          <p className="text-xs" style={{ color: colors.textMuted }}>
                             {author && (author as { name?: string }).name}
                           </p>
                         </div>
@@ -244,7 +250,7 @@ export function ActivityTimelineCard({
                   })}
                 </ul>
                 {typingUsers.length > 0 && (
-                  <p className="text-xs mb-2" style={{ color: landingColors.textMuted }}>
+                  <p className="text-xs mb-2" style={{ color: colors.textMuted }}>
                     {typingUsers.map((u: TypingUser) => u.userName).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing…
                   </p>
                 )}
@@ -255,13 +261,13 @@ export function ActivityTimelineCard({
                       onChange={handleCommentChange}
                       onBlur={handleCommentBlur}
                       placeholder="Add a comment…"
-                      className="flex-1 px-3 py-2 rounded-lg border text-sm bg-white"
-                      style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                      className="flex-1 px-3 py-2 rounded-lg border text-sm"
+                      style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                     />
                     <button
                       type="submit"
                       className="px-3 py-2 rounded-lg text-sm font-medium text-white shrink-0"
-                      style={{ backgroundColor: landingColors.primary }}
+                      style={{ backgroundColor: colors.primary }}
                     >
                       Send
                     </button>
@@ -272,8 +278,10 @@ export function ActivityTimelineCard({
           </div>
         ) : (
           <div
-            className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors"
-            style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+            className="flex items-center gap-2 px-4 py-2.5 cursor-pointer transition-colors"
+            style={{ backgroundColor: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             onClick={(e) => {
               e.stopPropagation();
               if (onOpenChat) onOpenChat(activity._id);
@@ -281,11 +289,11 @@ export function ActivityTimelineCard({
           >
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium shrink-0"
-              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
             >
               {getInitials(typingUsers[0]?.userName ?? (index === 0 ? 'Sarah' : 'Mike'))}
             </div>
-            <span className="text-xs" style={{ color: landingColors.textMuted }}>
+            <span className="text-xs" style={{ color: colors.textMuted }}>
               {typingUsers.length > 0
                 ? `${typingUsers.map((u: TypingUser) => u.userName).join(', ')} ${typingUsers.length === 1 ? 'is' : 'are'} typing…`
                 : 'Collaborate on this activity'}

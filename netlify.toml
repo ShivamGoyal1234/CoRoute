@@ -1,0 +1,29 @@
+# CoRoute – Netlify build and deploy
+# Use this if the repo root is the project root and frontend lives in frontend/
+
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# Headers to fix JS module MIME type (application/octet-stream → application/javascript)
+# Also applied via frontend/public/_headers copied into dist
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+
+[[headers]]
+  for = "/*.mjs"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+
+[[headers]]
+  for = "/assets/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+
+[[headers]]
+  for = "/assets/*.mjs"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"

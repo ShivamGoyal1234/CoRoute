@@ -3,7 +3,7 @@ import { getInitials } from '../../utils/helpers';
 import { useSocket, type FeedEvent, type TypingUser, type CollabTypingUser } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { tripsApi } from '../../lib/api';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 
 const COLLAB_TYPING_DEBOUNCE_MS = 400;
 
@@ -33,6 +33,7 @@ function formatFeedTime(timestamp: string) {
 }
 
 export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveFeed }: CollaborationFeedProps) {
+  const colors = useLandingColors();
   const [minimized, setMinimized] = useState(false);
   const { user } = useAuth();
   const {
@@ -96,7 +97,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
     return (
       <aside
         className="w-12 shrink-0 flex flex-col items-center justify-center border-l py-3"
-        style={{ borderColor: 'rgba(226, 232, 240, 0.8)', backgroundColor: '#fff' }}
+        style={{ borderColor: colors.border, backgroundColor: colors.surface }}
       >
         <button
           type="button"
@@ -105,7 +106,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
           title="Expand chat"
           aria-label="Expand collaboration feed"
         >
-          <svg className="w-5 h-5" style={{ color: landingColors.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-5 h-5" style={{ color: colors.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
         </button>
@@ -116,10 +117,10 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
   return (
     <aside
       className="w-72 shrink-0 flex flex-col border-l"
-      style={{ borderColor: 'rgba(226, 232, 240, 0.8)', backgroundColor: '#fff' }}
+      style={{ borderColor: colors.border, backgroundColor: colors.surface }}
     >
-      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: landingColors.textMuted }}>
+      <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: colors.border }}>
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.textMuted }}>
           Collaboration feed
         </span>
         <div className="flex items-center gap-0.5">
@@ -143,20 +144,20 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4">
         {(dedupedTyping.length > 0 || otherCollabTyping.length > 0) && (
-          <div className="pb-3 mb-3 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: landingColors.textMuted }}>
+          <div className="pb-3 mb-3 border-b" style={{ borderColor: colors.border }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.textMuted }}>
               Typing now
             </p>
             {otherCollabTyping.map((t: CollabTypingUser) => (
               <div key={`collab-${t.userId}`} className="flex gap-3 mb-2">
                 <div
                   className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
-                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                 >
                   {getInitials(t.userName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: landingColors.text }}>
+                  <p className="text-sm" style={{ color: colors.text }}>
                     <span className="font-medium">{t.userName}</span> is typing a message…
                   </p>
                 </div>
@@ -166,12 +167,12 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
               <div key={`${t.userId}-${t.activityId}`} className="flex gap-3 mb-2">
                 <div
                   className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
-                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                 >
                   {getInitials(t.userName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: landingColors.text }}>
+                  <p className="text-sm" style={{ color: colors.text }}>
                     <span className="font-medium">{t.userName}</span> is typing a comment
                     {t.activityTitle ? ` in "${t.activityTitle.length > 25 ? t.activityTitle.slice(0, 25) + '…' : t.activityTitle}"` : '…'}
                   </p>
@@ -184,29 +185,29 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
           <div key={`${item.name}-${item.time}-${i}`} className="flex gap-3">
             <div
               className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium"
-              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: landingColors.primary }}
+              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
             >
               {getInitials(item.name)}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm" style={{ color: landingColors.text }}>
+              <p className="text-sm" style={{ color: colors.text }}>
                 <span className="font-medium">{item.name}</span> {item.text}
               </p>
               {item.detail && (
-                <p className="text-sm mt-0.5 font-medium" style={{ color: landingColors.primary }}>
+                <p className="text-sm mt-0.5 font-medium" style={{ color: colors.primary }}>
                   {item.detail}
                 </p>
               )}
-              {!item.typing && <p className="text-xs mt-0.5" style={{ color: landingColors.textMuted }}>{item.time}</p>}
+              {!item.typing && <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>{item.time}</p>}
             </div>
           </div>
         )) : (
-          <p className="text-sm py-4" style={{ color: landingColors.textMuted }}>
+          <p className="text-sm py-4" style={{ color: colors.textMuted }}>
             Activity from your collaborators will appear here.
           </p>
         )}
       </div>
-      <div className="shrink-0 p-4 border-t" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
+      <div className="shrink-0 p-4 border-t" style={{ borderColor: colors.border }}>
         <div className="flex gap-2">
           <input
             value={tripNote}
@@ -215,14 +216,14 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Send a message to the team..."
             className="flex-1 px-3 py-2 rounded-lg border text-sm placeholder-slate-400"
-            style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+            style={{ borderColor: colors.border }}
           />
           <button
             type="button"
             onClick={handleSendMessage}
             disabled={!tripNote.trim() || !tripId}
             className="p-2 rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ color: landingColors.primary }}
+            style={{ color: colors.primary }}
             aria-label="Send"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -84,8 +84,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
 
   return (
     <section className="w-full" style={{ backgroundColor: colors.background }}>
-      <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 grid md:grid-cols-2 gap-12 items-center">
-        <div>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-24 grid md:grid-cols-2 gap-8 md:gap-12 items-start">
+        <div className="min-w-0">
           <motion.div
             initial={skip ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -108,11 +108,11 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
             initial={skip ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="flex flex-col items-start p-0 mb-6 shrink-0 grow-0 w-full max-w-[536px] min-h-[120px]"
+            className="flex flex-col items-start p-0 mb-6 shrink-0 grow-0 w-full max-w-[536px] min-h-[100px] sm:min-h-[120px]"
             style={{ color: colors.text }}
           >
             <h1
-              className="text-4xl md:text-5xl font-bold tracking-tight leading-tight m-0"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight m-0"
               style={{ color: colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: '1.1' }}
             >
               Plan Trips Together, <span style={{ color: colors.primary, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Seamlessly</span>
@@ -122,7 +122,7 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
             initial={skip ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-lg mb-8 max-w-lg"
+            className="text-base sm:text-lg mb-6 sm:mb-8 max-w-lg"
             style={{ color: colors.textMuted }}
           >
             The ultimate collaborative platform for modern travelers. Real-time editing, group budgeting, and shared checklists in one beautiful space.
@@ -193,17 +193,17 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
             </motion.p>
           </div>
         </div>
-        <motion.div
-          initial={skip ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative flex justify-center md:justify-end"
-          style={{ perspective: '1200px' }}
-        >
+          <motion.div
+            initial={skip ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="relative flex justify-center md:justify-end min-w-0"
+            style={{ perspective: '1200px' }}
+          >
           <motion.div
             whileHover={{ rotateY: -2, rotateX: 2 }}
             transition={{ duration: 0.3 }}
-            className="rounded-xl overflow-hidden shadow-2xl border w-full max-w-[680px] aspect-[3/2] min-h-[320px] flex flex-col"
+            className="rounded-xl overflow-hidden shadow-2xl border w-full max-w-[680px] aspect-[3/2] min-h-[280px] sm:min-h-[320px] flex flex-col"
             style={{ borderColor: colors.border, backgroundColor: colors.surface, boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.04)' }}
           >
             <div className="flex items-center gap-3 px-3 py-2 border-b shrink-0" style={{ borderColor: colors.border, backgroundColor: colors.headerBg }}>
@@ -212,16 +212,17 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
                 <div className="w-3 h-3 rounded-full bg-emerald-500" />
               </div>
-              <div className="flex-1 flex items-center justify-center">
-                <span className="text-xs text-slate-400 font-normal" style={{ color: colors.textMuted }}>
+              <div className="flex-1 flex items-center justify-center min-w-0">
+                <span className="text-[10px] sm:text-xs font-normal truncate px-1" style={{ color: colors.textMuted }}>
                   coroute.app/tokyo-adventure-2024
                 </span>
               </div>
               <div className="w-12" />
             </div>
-            <div className="flex-1 flex flex-col min-h-0 p-2.5 gap-0 bg-gradient-to-br from-teal-500 via-teal-500 to-emerald-600">
-              <div className="flex-1 rounded-lg overflow-hidden flex min-h-0 shadow-inner border border-white/30 flex-col sm:flex-row">
-                <form onSubmit={handlePlanSubmit} className="w-full sm:w-[52%] sm:min-w-[220px] sm:max-w-[320px] shrink-0 flex flex-col p-3 border-b sm:border-b-0 sm:border-r overflow-y-auto" style={{ borderColor: colors.border, background: `linear-gradient(to bottom, ${colors.headerBg}90, ${colors.surface})` }}>
+            <div className="flex-1 flex flex-col min-h-0 p-2.5 gap-0 from-teal-500 via-teal-500 to-emerald-600">
+              <div className="flex-1 rounded-lg overflow-hidden flex min-h-0 shadow-inner flex-col sm:flex-row" style={{ borderWidth: 1, borderStyle: 'solid', borderColor: colors.border }}>
+                <form onSubmit={handlePlanSubmit} className="hero-right-form w-full sm:w-[52%] sm:min-w-[220px] sm:max-w-[320px] shrink-0 flex flex-col p-3 border-b sm:border-b-0 sm:border-r overflow-y-auto" style={{ borderColor: colors.border, background: `linear-gradient(to bottom, ${colors.headerBg}90, ${colors.surface})` }}>
+                  <style>{`.hero-right-form input::placeholder,.hero-right-form textarea::placeholder{color:${colors.textMuted}}.hero-right-form input:focus,.hero-right-form textarea:focus,.hero-right-form select:focus{border-color:#8B5CF6!important;background-color:${colors.surface}!important}`}</style>
                   <h3 className="text-xs font-bold tracking-tight mb-2.5 shrink-0" style={{ color: colors.text }}>Planning</h3>
                   <label className="text-[9px] font-semibold uppercase tracking-widest mb-1 block" style={{ color: colors.textMuted }}>Destination</label>
                   <input
@@ -229,23 +230,23 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                     placeholder="e.g. Tokyo, Japan"
-                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200/90 bg-white/80 focus:bg-white focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all placeholder:text-slate-400 mb-2"
-                    style={{ color: colors.text }}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all mb-2"
+                    style={{ color: colors.text, borderColor: colors.border, backgroundColor: colors.surface, borderWidth: 1, borderStyle: 'solid' }}
                   />
-                  <div className="flex gap-1 p-0.5 rounded-lg bg-slate-100/80 border border-slate-200/80 mb-2">
+                  <div className="flex gap-1 p-0.5 rounded-lg mb-2" style={{ backgroundColor: colors.headerBg, borderWidth: 1, borderStyle: 'solid', borderColor: colors.border }}>
                     <button
                       type="button"
                       onClick={() => setTripType('one-way')}
-                      className={`flex-1 py-1.5 rounded-md text-[11px] font-semibold transition-all duration-200 ${tripType === 'one-way' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                      style={tripType === 'one-way' ? { color: colors.text } : {}}
+                      className="flex-1 py-1.5 rounded-md text-[11px] font-semibold transition-all duration-200"
+                      style={tripType === 'one-way' ? { color: colors.text, backgroundColor: colors.surface, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' } : { color: colors.textMuted }}
                     >
                       One way
                     </button>
                     <button
                       type="button"
                       onClick={() => setTripType('round-trip')}
-                      className={`flex-1 py-1.5 rounded-md text-[11px] font-semibold transition-all duration-200 ${tripType === 'round-trip' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                      style={tripType === 'round-trip' ? { color: colors.text } : {}}
+                      className="flex-1 py-1.5 rounded-md text-[11px] font-semibold transition-all duration-200"
+                      style={tripType === 'round-trip' ? { color: colors.text, backgroundColor: colors.surface, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' } : { color: colors.textMuted }}
                     >
                       Round trip
                     </button>
@@ -256,8 +257,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="flex-1 min-w-0 px-2 py-2 text-xs rounded-lg border border-slate-200/90 bg-white/80 focus:bg-white focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all"
-                      style={{ color: colors.text }}
+                      className="flex-1 min-w-0 px-2 py-2 text-xs rounded-lg focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all"
+                      style={{ color: colors.text, borderColor: colors.border, backgroundColor: colors.surface, borderWidth: 1, borderStyle: 'solid' }}
                     />
                     {tripType === 'round-trip' && (
                       <input
@@ -265,8 +266,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
                         min={startDate}
-                        className="flex-1 min-w-0 px-2 py-2 text-xs rounded-lg border border-slate-200/90 bg-white/80 focus:bg-white focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all"
-                        style={{ color: colors.text }}
+                        className="flex-1 min-w-0 px-2 py-2 text-xs rounded-lg focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all"
+                        style={{ color: colors.text, borderColor: colors.border, backgroundColor: colors.surface, borderWidth: 1, borderStyle: 'solid' }}
                       />
                     )}
                   </div>
@@ -274,8 +275,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                   <select
                     value={routeOption}
                     onChange={(e) => setRouteOption(e.target.value as 'fastest' | 'shortest' | 'scenic')}
-                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200/90 bg-white/80 focus:bg-white focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all mb-2 appearance-none cursor-pointer bg-[length:10px] bg-[right_0.5rem_center] bg-no-repeat pr-7"
-                    style={{ color: colors.text, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E\")" }}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all mb-2 appearance-none cursor-pointer bg-[length:10px] bg-[right_0.5rem_center] bg-no-repeat pr-7"
+                    style={{ color: colors.text, borderColor: colors.border, backgroundColor: colors.surface, borderWidth: 1, borderStyle: 'solid', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='${encodeURIComponent(colors.textMuted)}'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")` }}
                   >
                     <option value="fastest">Fastest</option>
                     <option value="shortest">Shortest</option>
@@ -287,8 +288,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                     onChange={(e) => setDetails(e.target.value)}
                     placeholder="Notes..."
                     rows={1}
-                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200/90 bg-white/80 focus:bg-white focus:border-[#8B5CF6] focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all resize-none placeholder:text-slate-400 mb-2 min-h-[36px]"
-                    style={{ color: colors.text }}
+                    className="w-full px-2.5 py-2 text-xs rounded-lg focus:ring-2 focus:ring-[#8B5CF6]/20 outline-none transition-all resize-none mb-2 min-h-[36px]"
+                    style={{ color: colors.text, borderColor: colors.border, backgroundColor: colors.surface, borderWidth: 1, borderStyle: 'solid' }}
                   />
                   <div className="mt-auto flex gap-2 pt-2 shrink-0">
                     <button
@@ -301,8 +302,8 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                     <button
                       type="button"
                       onClick={handleSaveDraft}
-                      className="flex-1 py-2 rounded-lg text-xs font-semibold border border-slate-200/90 bg-white/80 hover:bg-slate-50/80 hover:border-slate-300 transition-all duration-200"
-                      style={{ color: colors.textMuted }}
+                      className="flex-1 py-2 rounded-lg text-xs font-semibold border transition-all duration-200"
+                      style={{ color: colors.textMuted, borderColor: colors.border, backgroundColor: colors.surface }}
                     >
                       Save draft
                     </button>
@@ -312,10 +313,10 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
                   {import.meta.env.VITE_GOOGLE_MAPS_API_KEY ? (
                     <HeroMap />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100" style={{ minHeight: 160 }}>
-                      <p className="text-xs text-slate-500 px-4 text-center mb-2">Google Map</p>
-                      <p className="text-[10px] text-slate-400 text-center px-4">
-                        <code className="bg-slate-200 px-1 rounded">Failed to load the map. Please check.</code>
+                    <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: 160, backgroundColor: colors.headerBg }}>
+                      <p className="text-xs px-4 text-center mb-2" style={{ color: colors.textMuted }}>Google Map</p>
+                      <p className="text-[10px] text-center px-4" style={{ color: colors.textMuted }}>
+                        <code className="px-1 rounded" style={{ backgroundColor: colors.border }}>Failed to load the map. Please check.</code>
                       </p>
                     </div>
                   )}
@@ -332,7 +333,7 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4 }}
-          className="text-3xl md:text-4xl font-bold text-center mb-3"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-3 px-2"
           style={{ color: colors.text }}
         >
           From Logistics to Liftoff
@@ -342,7 +343,7 @@ export function HeroSection({ colors }: { colors: ReturnType<typeof useLandingCo
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="text-center max-w-xl mx-auto mb-12 md:mb-16"
+          className="text-center max-w-xl mx-auto mb-10 sm:mb-12 md:mb-16 px-2 text-sm sm:text-base"
           style={{ color: colors.textMuted }}
         >
           Stop burying flight PDFs in group chat history. CoRoute centralizes your collective travel intelligence into a single, collaborative source of truth.

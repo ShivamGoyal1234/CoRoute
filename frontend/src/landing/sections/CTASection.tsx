@@ -11,7 +11,7 @@ export function CTASection({ colors }: { colors: ReturnType<typeof useLandingCol
         initial={skip ? false : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="relative rounded-3xl px-8 md:px-12 py-12 md:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-8 text-white overflow-hidden"
+        className="relative rounded-2xl sm:rounded-3xl px-6 sm:px-8 md:px-12 py-10 sm:py-12 md:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6 sm:gap-8 text-white overflow-hidden"
         style={{ backgroundColor: colors.primary }}
       >
         <div className="absolute inset-0 pointer-events-none" aria-hidden>
@@ -41,8 +41,8 @@ export function CTASection({ colors }: { colors: ReturnType<typeof useLandingCol
           </svg>
         </div>
         <div className="relative z-10 text-center md:text-left">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">Ready for your next big trip?</h2>
-          <p className="text-white/90 text-lg max-w-xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">Ready for your next big trip?</h2>
+          <p className="text-white/90 text-base sm:text-lg max-w-xl">
             Join thousands of travelers who have made planning half the fun.
           </p>
         </div>

@@ -20,7 +20,7 @@ export function TestimonialsSection({ colors }: { colors: ReturnType<typeof useL
           initial={skip ? false : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold text-center mb-4"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 px-2"
           style={{ color: colors.text }}
         >
           Travelers love CoRoute

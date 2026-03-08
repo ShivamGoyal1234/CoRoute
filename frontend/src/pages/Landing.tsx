@@ -36,7 +36,7 @@ export default function Landing() {
 function LandingContent() {
   const colors = useLandingColors();
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.background }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: colors.background }}>
       <LandingHeader colors={colors} />
       <HeroSection colors={colors} />
       <FeaturesSection colors={colors} />

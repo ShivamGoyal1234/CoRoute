@@ -37,7 +37,7 @@ export function TrustedBySection({ colors }: { colors: ReturnType<typeof useLand
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="text-3xl md:text-4xl font-bold text-center tracking-tight"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center tracking-tight px-2"
           style={{ color: colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           Trusted by the world&apos;s most organized travelers

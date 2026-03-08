@@ -1,5 +1,5 @@
 import { Reorder } from 'framer-motion';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 import type { Day, Activity, TripLocation } from '../../types';
 import { TripLocationMap } from '../../components/TripLocationMap';
 import { ActivityTimelineCard } from './ActivityTimelineCard';
@@ -82,11 +82,12 @@ export function ItinerarySection({
   onDiscussionUpdate,
   onReorderActivities,
 }: ItinerarySectionProps) {
+  const colors = useLandingColors();
   return (
     <>
       <div
         className="shrink-0 px-6 pt-4 pb-3"
-        style={{ backgroundColor: '#f8f8f8', borderBottom: '1px solid rgba(226, 232, 240, 0.8)' }}
+        style={{ backgroundColor: colors.background, borderBottom: `1px solid ${colors.border}` }}
       >
         <div className="flex items-end gap-8 flex-wrap">
           {days.map((day) => {
@@ -97,12 +98,12 @@ export function ItinerarySection({
                 type="button"
                 onClick={() => onSelectDay(day._id)}
                 className="text-sm font-semibold uppercase tracking-wide transition-colors focus:outline-none"
-                style={{ color: isActive ? landingColors.primary : '#6c757d', marginTop: '24px', marginLeft: '24px' }}
+                style={{ color: isActive ? colors.primary : colors.textMuted, marginTop: '24px', marginLeft: '24px' }}
               >
                 <span
                   className="inline-block pb-1"
                   style={{
-                    borderBottom: isActive ? `3px solid ${landingColors.primary}` : '3px solid transparent',
+                    borderBottom: isActive ? `3px solid ${colors.primary}` : '3px solid transparent',
                   }}
                 >
                   Day {day.dayNumber}
@@ -118,7 +119,7 @@ export function ItinerarySection({
                     type="button"
                     onClick={() => setAddDayOpen(true)}
                     className="pb-1 text-sm font-medium uppercase tracking-wide transition-colors focus:outline-none"
-                    style={{ color: '#6c757d' }}
+                    style={{ color: colors.textMuted }}
                   >
                     + Add Day
                   </button>
@@ -131,7 +132,7 @@ export function ItinerarySection({
                     value={newDayNumber}
                     onChange={(e) => setNewDayNumber(Number(e.target.value))}
                     className="w-14 px-2 py-1.5 rounded border text-sm"
-                    style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                    style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                   />
                   <input
                     type="date"
@@ -139,12 +140,12 @@ export function ItinerarySection({
                     onChange={(e) => setNewDayDate(e.target.value)}
                     required
                     className="px-2 py-1.5 rounded border text-sm"
-                    style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}
+                    style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                   />
-                  <button type="submit" className="px-3 py-1.5 rounded-lg text-sm font-medium text-white" style={{ backgroundColor: landingColors.primary }}>
+                  <button type="submit" className="px-3 py-1.5 rounded-lg text-sm font-medium text-white" style={{ backgroundColor: colors.primary }}>
                     Add
                   </button>
-                  <button type="button" onClick={() => setAddDayOpen(false)} className="px-3 py-1.5 rounded-lg text-sm border" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
+                  <button type="button" onClick={() => setAddDayOpen(false)} className="px-3 py-1.5 rounded-lg text-sm border" style={{ borderColor: colors.border, color: colors.text }}>
                     Cancel
                   </button>
                 </form>
@@ -164,7 +165,7 @@ export function ItinerarySection({
                   style={{ backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
                 />
                 {activities.length === 0 && !addActivityDayId && (
-                  <p className="text-sm py-6" style={{ color: landingColors.textMuted }}>
+                  <p className="text-sm py-6" style={{ color: colors.textMuted }}>
                     No activities yet for this day.
                   </p>
                 )}
@@ -238,7 +239,7 @@ export function ItinerarySection({
                     onClick={() => setAddActivityDayId(selectedDayId)}
                     className="flex items-center gap-2 px-6 py-3 rounded-full font-medium text-white shadow-lg transition-opacity hover:opacity-95 cursor-pointer"
                     style={{
-                      backgroundColor: landingColors.secondary,
+                      backgroundColor: colors.secondary,
                       boxShadow: '0 4px 14px 0 rgba(251, 146, 60, 0.4)',
                     }}
                   >
@@ -252,7 +253,7 @@ export function ItinerarySection({
 
               <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
                 <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-                  <span className="text-sm font-medium" style={{ color: landingColors.text }}>
+                  <span className="text-sm font-medium" style={{ color: colors.text }}>
                     Map Preview
                   </span>
                 </div>

@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ThemeToggle } from '../components';
+import { useTheme } from '../contexts/ThemeContext';
 import { useLandingColors } from '../landing/theme';
-import logoImg from '../assets/logo.svg';
+import logoImg from '../assets/Logos/log.svg';
+import darkLogoImg from '../assets/Logos/dark_logo.svg';
 import { authApi } from '../lib/api';
 
 export default function ForgotPassword() {
   const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -68,12 +71,7 @@ export default function ForgotPassword() {
           <div className="p-8 md:p-10">
             <Link to="/" className="flex flex-col items-center mb-8">
               <div className="flex items-center gap-2 mb-2">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: colors.success }}
-                >
-                  <img src={logoImg} alt="" className="h-5 w-5 object-contain brightness-0 invert" />
-                </div>
+                <img src={effectiveTheme === 'dark' ? darkLogoImg : logoImg} alt="" className="h-16 w-24 md:h-20 md:w-48 object-contain flex-shrink-0" />
                 <span className="font-bold text-xl tracking-tight" style={{ color: colors.text }}>
                   coRoute
                 </span>

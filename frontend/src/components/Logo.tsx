@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
-import logoImg from '../assets/logo.svg';
+import { useTheme } from '../contexts/ThemeContext';
+import logoImg from '../assets/Logos/log.svg';
+import darkLogoImg from '../assets/Logos/dark_logo.svg';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
@@ -7,13 +9,15 @@ interface LogoProps {
 }
 
 const sizeMap = {
-  sm: 'h-8 w-auto max-w-12',
-  md: 'h-12 w-auto max-w-20',
-  lg: 'h-16 w-auto max-w-28',
+  sm: 'h-12 w-20 md:h-14 md:w-28 object-contain',
+  md: 'h-16 w-24 md:h-20 md:w-48 object-contain',
+  lg: 'h-20 w-32 md:h-24 md:w-56 object-contain',
 };
 
 export const Logo = ({ size = 'md', animated = true }: LogoProps) => {
+  const { effectiveTheme } = useTheme();
   const Component = animated ? motion.div : 'div';
+  const logoSrc = effectiveTheme === 'dark' ? darkLogoImg : logoImg;
 
   const animationProps = animated
     ? {
@@ -25,12 +29,12 @@ export const Logo = ({ size = 'md', animated = true }: LogoProps) => {
 
   return (
     <Component {...animationProps} className="flex items-center gap-2">
-      <div className="relative flex-shrink-0 flex items-center" style={{ minWidth: size === 'sm' ? 48 : size === 'lg' ? 112 : 80 }}>
+      <div className="relative flex-shrink-0 flex items-center" style={{ minWidth: size === 'sm' ? 72 : size === 'lg' ? 128 : 96 }}>
         <img
-          src={logoImg}
+          src={logoSrc}
           alt="coRoute"
-          className={`${sizeMap[size]} object-contain object-left`}
-          style={{ minWidth: size === 'sm' ? 48 : size === 'lg' ? 112 : 80 }}
+          className={`${sizeMap[size]} object-left`}
+          style={{ minWidth: size === 'sm' ? 72 : size === 'lg' ? 128 : 96 }}
         />
       </div>
       <motion.span

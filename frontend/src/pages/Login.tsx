@@ -3,11 +3,14 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ThemeToggle } from '../components';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { useLandingColors } from '../landing/theme';
-import logoImg from '../assets/logo.svg';
+import logoImg from '../assets/Logos/log.svg';
+import darkLogoImg from '../assets/Logos/dark_logo.svg';
 
 export default function Login() {
   const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -52,19 +55,9 @@ export default function Login() {
           <div className="p-8 md:p-10">
             <Link to="/" className="flex flex-col items-center mb-8">
               <div className="flex items-center gap-2 mb-2">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: colors.success }}
-                >
-                  <img src={logoImg} alt="" className="h-5 w-5 object-contain brightness-0 invert" />
-                </div>
-                <span className="font-bold text-xl tracking-tight" style={{ color: colors.text }}>
-                  coRoute
-                </span>
+                <img src={effectiveTheme === 'dark' ? darkLogoImg : logoImg} alt="" className="h-16 w-24 md:h-20 md:w-48 object-contain flex-shrink-0" />
+
               </div>
-              <span className="text-sm" style={{ color: colors.textMuted }}>
-                Shared Paths, Seamless Plans
-              </span>
             </Link>
 
             <motion.div
@@ -79,11 +72,12 @@ export default function Login() {
                 Please enter your details to access your account.
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="login-form space-y-5">
+                <style>{`.login-form input::placeholder { color: ${colors.textMuted}; }.login-form input[type="checkbox"] { background-color: ${colors.surface} !important; border: 1px solid ${colors.border} !important; }.login-form input[type="email"]:focus,.login-form input[type="password"]:focus { border-color: #8B5CF6 !important; background-color: ${colors.surface} !important; }`}</style>
                 {error && (
                   <div
                     className="p-3 rounded-lg text-sm"
-                    style={{ backgroundColor: '#FEF2F2', color: '#B91C1C' }}
+                    style={{ backgroundColor: effectiveTheme === 'dark' ? 'rgba(185, 28, 28, 0.25)' : '#FEF2F2', color: effectiveTheme === 'dark' ? '#FCA5A5' : '#B91C1C' }}
                   >
                     {error}
                   </div>
@@ -94,7 +88,7 @@ export default function Login() {
                     Email Address
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: colors.textMuted }} aria-hidden>
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
@@ -104,7 +98,8 @@ export default function Login() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow"
+                      style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                       placeholder="name@company.com"
                     />
                   </div>
@@ -124,7 +119,7 @@ export default function Login() {
                     </Link>
                   </div>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: colors.textMuted }} aria-hidden>
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
@@ -134,7 +129,8 @@ export default function Login() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 transition-shadow"
+                      style={{ color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }}
                       placeholder="••••••••"
                     />
                   </div>
@@ -145,7 +141,8 @@ export default function Login() {
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded-full border-slate-300 text-[#8B5CF6] focus:ring-[#8B5CF6]/20"
+                    className="w-4 h-4 rounded border focus:ring-[#8B5CF6]/20 focus:ring-2"
+                    style={{ accentColor: colors.primary }}
                   />
                   <span className="text-sm" style={{ color: colors.textMuted }}>
                     Remember me for 30 days
@@ -171,17 +168,18 @@ export default function Login() {
               </form>
 
               <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px bg-slate-200" />
+                <div className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
                 <span className="text-xs font-medium uppercase tracking-wider" style={{ color: colors.textMuted }}>
                   Or continue with
                 </span>
-                <div className="flex-1 h-px bg-slate-200" />
+                <div className="flex-1 h-px" style={{ backgroundColor: colors.border }} />
               </div>
 
               <div className="flex gap-3">
                 <button
                   type="button"
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-xl border font-medium transition-colors flex items-center justify-center gap-2"
+                  style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -193,7 +191,8 @@ export default function Login() {
                 </button>
                 <button
                   type="button"
-                  className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 rounded-xl border font-medium transition-colors flex items-center justify-center gap-2"
+                  style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13 2.9 1.19 4.04-.95 4.04-.95-.03-.02 2.31-1.4 2.31-4.22-.02-2.8-2.28-4.66-4.32-4.69-1.36-.02-2.64.47-3.68 1.32-.52-.3-1.2-.5-1.9-.5-2.07 0-3.75 1.68-3.75 3.75 0 1.44.77 2.71 1.92 3.42-.07.24-.15.5-.15.78 0 2.06 1.67 3.73 3.73 3.73 2.06 0 3.73-1.67 3.73-3.73 0-.28-.02-.54-.07-.78 1.15-.71 1.92-1.98 1.92-3.42 0-2.07-1.68-3.75-3.75-3.75-.7 0-1.38.2-1.98.54-.98-.78-2.24-1.25-3.58-1.25z" />

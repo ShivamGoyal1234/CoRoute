@@ -36,7 +36,7 @@ export function MembershipSection({ colors }: { colors: ReturnType<typeof useLan
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.4, delay: 0.05 }}
-          className="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight px-2"
           style={{ color: colors.text, fontFamily: "'Plus Jakarta Sans', sans-serif" }}
         >
           Simple, transparent pricing

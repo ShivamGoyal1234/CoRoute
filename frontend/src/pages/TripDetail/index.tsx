@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { Loading, ActivityDetailModal } from '../../components';
-import { landingColors } from '../../landing/theme';
+import { useLandingColors } from '../../landing/theme';
 import { tripsApi } from '../../lib/api';
 import { useTripDetail } from './useTripDetail';
 import { TripDetailHeader } from './TripDetailHeader';
@@ -24,6 +24,7 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 export default function TripDetailPage() {
+  const colors = useLandingColors();
   const state = useTripDetail();
   const { logout } = useAuth();
   const { joinTrip, leaveTrip, updateSection, seedFeed } = useSocket();
@@ -82,10 +83,10 @@ export default function TripDetailPage() {
 
   if (!trip) {
     return (
-      <div className="h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+      <div className="h-screen flex items-center justify-center" style={{ backgroundColor: colors.background }}>
         <div className="text-center">
-          <p className="text-slate-600 dark:text-slate-400">Trip not found.</p>
-          <Link to="/dashboard" className="mt-4 inline-block text-primary hover:underline">
+          <p style={{ color: colors.textMuted }}>Trip not found.</p>
+          <Link to="/dashboard" className="mt-4 inline-block hover:underline" style={{ color: colors.primary }}>
             Back to dashboard
           </Link>
         </div>
@@ -95,8 +96,8 @@ export default function TripDetailPage() {
 
   return (
     <div
-      className="trip-detail-page h-screen flex flex-col w-full bg-white dark:bg-slate-900 overflow-hidden"
-      style={{ backgroundColor: landingColors.background }}
+      className="trip-detail-page h-screen flex flex-col w-full overflow-hidden"
+      style={{ backgroundColor: colors.background }}
     >
       {section === 'budgeting' ? (
         <BudgetTopNavHeader

@@ -6,6 +6,7 @@ import type { Activity, Comment, Attachment } from '../types';
 import { formatPrice, formatTime, getInitials } from '../utils/helpers';
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket, type TypingUser } from '../contexts/SocketContext';
+import { useLandingColors } from '../landing/theme';
 
 const TYPING_DEBOUNCE_MS = 400;
 
@@ -19,6 +20,7 @@ interface ActivityDetailModalProps {
 }
 
 export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, onDelete, useRealtime }: ActivityDetailModalProps) {
+  const colors = useLandingColors();
   const { user } = useAuth();
   const { onCommentNew, onAttachmentNew, onAttachmentRemoved, emitTypingStart, emitTypingStop, typingByActivity } = useSocket();
   const typingDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -165,10 +167,11 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col"
+        className="rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col"
+        style={{ backgroundColor: colors.surface }}
       >
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+        <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: colors.border }}>
+          <h2 className="text-lg font-semibold" style={{ color: colors.text }}>
             {loading ? 'Loading…' : activity?.title ?? 'Activity'}
           </h2>
           <div className="flex items-center gap-1">
@@ -183,7 +186,10 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500"
+              className="p-2 rounded-lg transition-colors"
+              style={{ color: colors.textMuted }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
               aria-label="Close"
             >
               ×
@@ -192,66 +198,71 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {loading ? (
-            <p className="text-slate-500">Loading…</p>
+            <p style={{ color: colors.textMuted }}>Loading…</p>
           ) : activity ? (
             <>
               {canEdit && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400">Title</label>
+                  <label className="block text-sm font-medium" style={{ color: colors.textMuted }}>Title</label>
                   <input
                     type="text"
                     value={activity.title}
                     onChange={(e) => setActivity((a) => (a ? { ...a, title: e.target.value } : null))}
                     onBlur={(e) => handleSaveActivity({ title: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                    className="w-full px-3 py-2 rounded-lg border text-sm"
+                    style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                   />
                   <div>
-                    <label className="block text-sm text-slate-500">Description</label>
+                    <label className="block text-sm" style={{ color: colors.textMuted }}>Description</label>
                     <textarea
                       value={activity.description ?? ''}
                       onChange={(e) => setActivity((a) => (a ? { ...a, description: e.target.value } : null))}
                       onBlur={(e) => handleSaveActivity({ description: e.target.value || undefined })}
                       rows={2}
                       placeholder="Optional"
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-sm text-slate-500">Time</label>
+                      <label className="block text-sm" style={{ color: colors.textMuted }}>Time</label>
                       <input
                         type="time"
                         value={activity.startTime ?? ''}
                         onChange={(e) => setActivity((a) => (a ? { ...a, startTime: e.target.value || undefined } : null))}
                         onBlur={(e) => handleSaveActivity({ startTime: e.target.value || undefined })}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-500">Image URL</label>
+                      <label className="block text-sm" style={{ color: colors.textMuted }}>Image URL</label>
                       <input
                         type="url"
                         value={activity.imageUrl ?? ''}
                         onChange={(e) => setActivity((a) => (a ? { ...a, imageUrl: e.target.value || undefined } : null))}
                         onBlur={(e) => handleSaveActivity({ imageUrl: e.target.value || undefined })}
                         placeholder="https://..."
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-sm text-slate-500">Location</label>
+                      <label className="block text-sm" style={{ color: colors.textMuted }}>Location</label>
                       <input
                         type="text"
                         value={activity.location ?? ''}
                         onChange={(e) => setActivity((a) => (a ? { ...a, location: e.target.value } : null))}
                         onBlur={(e) => handleSaveActivity({ location: e.target.value || undefined })}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-slate-500">Cost</label>
+                      <label className="block text-sm" style={{ color: colors.textMuted }}>Cost</label>
                       <input
                         type="number"
                         min="0"
@@ -259,12 +270,13 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                         value={activity.cost ?? ''}
                         onChange={(e) => setActivity((a) => (a ? { ...a, cost: e.target.value ? Number(e.target.value) : undefined } : null))}
                         onBlur={(e) => handleSaveActivity({ cost: e.target.value ? Number(e.target.value) : undefined })}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                        className="w-full px-3 py-2 rounded-lg border text-sm"
+                        style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-slate-500">Status</label>
+                    <label className="block text-sm" style={{ color: colors.textMuted }}>Status</label>
                     <select
                       value={activity.status}
                       onChange={(e) => {
@@ -272,7 +284,8 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                         setActivity((a) => (a ? { ...a, status } : null));
                         handleSaveActivity({ status });
                       }}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                     >
                       <option value="planned">Planned</option>
                       <option value="confirmed">Confirmed</option>
@@ -283,7 +296,7 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                 </div>
               )}
               {!canEdit && (
-                <div className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                <div className="text-sm space-y-2" style={{ color: colors.textMuted }}>
                   {activity.startTime && <p>Time: {formatTime(activity.startTime)}</p>}
                   {activity.description && <p>{activity.description}</p>}
                   {activity.location && <p>Location: {activity.location}</p>}
@@ -295,19 +308,19 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
               )}
 
               <div>
-                <h3 className="font-medium text-slate-800 dark:text-slate-100 mb-2">Comments</h3>
+                <h3 className="font-medium mb-2" style={{ color: colors.text }}>Comments</h3>
                 <ul className="space-y-2 mb-3">
                   {comments.map((c) => {
                     const author = typeof c.userId === 'object' ? c.userId : null;
                     const isOwn = user && author && (author as any)._id === user.id;
                     return (
-                      <li key={c._id} className="flex items-start gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                        <span className="shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-medium">
+                      <li key={c._id} className="flex items-start gap-2 p-2 rounded-lg" style={{ backgroundColor: colors.background }}>
+                        <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium" style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}>
                           {author ? getInitials((author as any).name) : '?'}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-slate-800 dark:text-slate-100">{c.content}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">
+                          <p className="text-sm" style={{ color: colors.text }}>{c.content}</p>
+                          <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>
                             {author && (author as any).name} · {new Date(c.createdAt).toLocaleString()}
                           </p>
                         </div>
@@ -325,7 +338,7 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                   })}
                 </ul>
                 {typingUsers.length > 0 && (
-                  <p className="text-xs text-slate-500 mb-2">
+                  <p className="text-xs mb-2" style={{ color: colors.textMuted }}>
                     {typingUsers.map((u: TypingUser) => u.userName).join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing…
                   </p>
                 )}
@@ -335,17 +348,23 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                     onChange={handleCommentChange}
                     onBlur={handleCommentBlur}
                     placeholder="Add a comment…"
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm"
+                    className="flex-1 px-3 py-2 rounded-lg border text-sm"
+                    style={{ borderColor: colors.border, backgroundColor: colors.background, color: colors.text }}
                   />
-                  <button type="submit" className="px-3 py-2 rounded-lg bg-primary text-white text-sm">Send</button>
+                  <button type="submit" className="px-3 py-2 rounded-lg text-white text-sm" style={{ backgroundColor: colors.primary }}>Send</button>
                 </form>
               </div>
 
               <div>
-                <h3 className="font-medium text-slate-800 dark:text-slate-100 mb-2">Attachments</h3>
+                <h3 className="font-medium mb-2" style={{ color: colors.text }}>Attachments</h3>
                 {canEdit && (
                   <label className="inline-block mb-2">
-                    <span className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-sm cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600">
+                    <span
+                      className="px-3 py-2 rounded-lg text-sm cursor-pointer transition-colors"
+                      style={{ backgroundColor: colors.background, color: colors.text }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.border; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                    >
                       {uploading ? 'Uploading…' : 'Upload file'}
                     </span>
                     <input
@@ -359,12 +378,13 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                 )}
                 <ul className="space-y-2">
                   {attachments.map((att) => (
-                    <li key={att._id} className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                    <li key={att._id} className="flex items-center justify-between p-2 rounded-lg" style={{ backgroundColor: colors.background }}>
                       <a
                         href={attachmentUrl(att.fileUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline truncate"
+                        className="text-sm hover:underline truncate"
+                        style={{ color: colors.primary }}
                       >
                         {att.fileName}
                       </a>
@@ -380,7 +400,7 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
                     </li>
                   ))}
                 </ul>
-                {attachments.length === 0 && !canEdit && <p className="text-sm text-slate-500">No attachments.</p>}
+                {attachments.length === 0 && !canEdit && <p className="text-sm" style={{ color: colors.textMuted }}>No attachments.</p>}
               </div>
             </>
           ) : null}
@@ -398,19 +418,23 @@ export function ActivityDetailModal({ activityId, canEdit, onClose, onUpdate, on
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-sm w-full p-6"
+          className="rounded-xl shadow-xl max-w-sm w-full p-6"
+          style={{ backgroundColor: colors.surface }}
         >
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-2">
+          <h3 className="text-lg font-semibold mb-2" style={{ color: colors.text }}>
             Delete activity
           </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+          <p className="text-sm mb-6" style={{ color: colors.textMuted }}>
             Delete this activity? This cannot be undone.
           </p>
           <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={() => setConfirmDeleteOpen(false)}
-              className="px-4 py-2 rounded-lg text-sm font-medium border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50"
+              className="px-4 py-2 rounded-lg text-sm font-medium border transition-colors"
+              style={{ borderColor: colors.border, color: colors.text }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               Cancel
             </button>
