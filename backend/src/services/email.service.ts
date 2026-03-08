@@ -15,9 +15,14 @@ function getTransporter(): nodemailer.Transporter | null {
     port,
     secure,
     auth: { user, pass },
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
   return transporter;
 }
+
+const SEND_MAIL_TIMEOUT_MS = 20000;
 
 export async function sendOtpEmail(to: string, otp: string, purpose: 'register' | 'forgot_password'): Promise<void> {
   const trans = getTransporter();
@@ -35,11 +40,15 @@ export async function sendOtpEmail(to: string, otp: string, purpose: 'register' 
     purpose === 'register'
       ? `Your verification code is: ${otp}. It expires in 10 minutes.`
       : `Your password reset code is: ${otp}. It expires in 10 minutes. If you didn't request this, ignore this email.`;
-  await trans.sendMail({
+  const sendPromise = trans.sendMail({
     from: config.smtp.from,
     to,
     subject,
     text,
     html: `<p>${text.replace(otp, `<strong>${otp}</strong>`)}</p>`,
   });
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Send mail timeout')), SEND_MAIL_TIMEOUT_MS)
+  );
+  await Promise.race([sendPromise, timeoutPromise]);
 }
