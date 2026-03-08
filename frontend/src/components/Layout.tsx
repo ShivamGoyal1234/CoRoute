@@ -1,0 +1,161 @@
+import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
+import { ThemeToggle } from './index';
+import { TripNotificationToaster } from './TripNotificationToaster';
+import { useAuth } from '../contexts/AuthContext';
+import { getInitials } from '../utils/helpers';
+import { useLandingColors } from '../landing/theme';
+import logoImg from '../assets/logo.svg';
+
+function isTripDetailPath(pathname: string): boolean {
+  return /^\/trips\/[^/]+$/.test(pathname);
+}
+
+const navItems = [
+  { to: '/dashboard', label: 'My Trips', icon: 'trips' },
+  { to: '/shared', label: 'Shared with Me', icon: 'shared' },
+  { to: '/archived', label: 'Archived', icon: 'archive' },
+];
+
+function NavIcon({ name }: { name: string }) {
+  const className = 'w-5 h-5 shrink-0';
+  switch (name) {
+    case 'dashboard':
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>
+      );
+    case 'trips':
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0h.5a2.5 2.5 0 002.5-2.5V8m0 4.065v-1.13a2 2 0 00-1.293-1.852l-.615-.205a2 2 0 01-1.292-1.852V5.5M8 3.935a2 2 0 00-2 2v.065M8 12v4m4-4v4m4-4v2.945M20.945 13H19a2 2 0 00-2 2v1a2 2 0 01-2 2 2 2 0 01-2-2v-2.945M16 20.065v-1.13a2 2 0 011.293-1.852l.615-.205a2 2 0 001.292-1.852V16" />
+        </svg>
+      );
+    case 'shared':
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      );
+    case 'archive':
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+export const Layout = () => {
+  const { user } = useAuth();
+  const location = useLocation();
+  const isTripBuilder = isTripDetailPath(location.pathname);
+  const colors = useLandingColors();
+
+  return (
+    <div
+      className="h-screen flex overflow-hidden transition-colors"
+      style={{ backgroundColor: colors.background }}
+    >
+      {user && !isTripBuilder && (
+        <aside
+          className="w-56 shrink-0 flex flex-col border-r"
+          style={{
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          }}
+        >
+          <div className="p-4 border-b" style={{ borderColor: colors.border }}>
+            <Link to="/dashboard" className="flex items-center gap-2.5">
+              <div
+                className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden"
+                style={{ backgroundColor: colors.primaryHeader }}
+              >
+                <img src={logoImg} alt="" className="h-5 w-5 object-contain brightness-0 invert" />
+              </div>
+              <span className="font-bold text-lg tracking-tight" style={{ color: colors.text }}>
+                coRoute
+              </span>
+            </Link>
+          </div>
+          <nav className="flex-1 py-4 px-3 flex flex-col gap-0.5">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.to}
+                end={item.to === '/dashboard'}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive ? '' : 'hover:opacity-90'}`}
+                style={({ isActive }) =>
+                  isActive
+                    ? { backgroundColor: '#EBE0F9', color: colors.primaryHeader }
+                    : { color: colors.textMuted }}
+              >
+                {({ isActive }) => (
+                  <>
+                    <span style={isActive ? { color: colors.primaryHeader } : undefined}>
+                      <NavIcon name={item.icon} />
+                    </span>
+                    {item.label}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="p-3 border-t space-y-1" style={{ borderColor: colors.border }}>
+            <Link
+              to="/settings"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
+              style={{ color: colors.textMuted }}
+            >
+              <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Settings
+            </Link>
+            <div
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
+              style={{ backgroundColor: colors.background }}
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0"
+                style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primaryHeader }}
+                title={user.email}
+              >
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  getInitials(user.name)
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium truncate" style={{ color: colors.text }}>
+                  {user.name}
+                </p>
+                <p className="text-xs truncate" style={{ color: colors.textMuted }}>
+                  Premium Plan
+                </p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      )}
+
+      <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
+        {user && <TripNotificationToaster />}
+        <main className={`flex-1 min-h-0 ${isTripBuilder ? 'p-0 overflow-hidden' : 'p-6 overflow-y-auto'}`}>
+          <Outlet />
+        </main>
+        {user && !isTripBuilder && (
+          <div className="absolute bottom-4 right-4">
+            <ThemeToggle />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

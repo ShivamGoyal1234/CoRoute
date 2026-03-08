@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-text: #1E293B;
+  --color-muted: #64748B;
+  --color-border: #E2E8F0;
+}
+
+.dark {
+  --color-bg: #0E172A;
+  --color-surface: #1E293B;
+  --color-card: #334155;
+  --color-text: #F8FAFC;
+  --color-muted: #94A3B8;
+  --color-border: #334155;
+}
+
+/* Ensure full viewport uses #0E172A in dark mode */
+.dark,
+.dark body {
+  background-color: #0E172A;
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateX(0) translateZ(0); }
+  50% { transform: translateX(-25%) translateZ(0); }
+}
+
+.travelers-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.travelers-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.travelers-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 3px;
+}
+.travelers-list-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.6);
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee 40s linear infinite reverse;
+}
