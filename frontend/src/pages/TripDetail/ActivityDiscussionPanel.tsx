@@ -124,10 +124,9 @@ export function ActivityDiscussionPanel({
             type="button"
             onClick={onOpenFullActivity}
             className="text-xs font-medium px-2 py-1 rounded"
-            style={{ backgroundColor: 'transparent' }}
+            style={{ backgroundColor: 'transparent', color: colors.primary }}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-            style={{ color: colors.primary }}
           >
             View full
           </button>
