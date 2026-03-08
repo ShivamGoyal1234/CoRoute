@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useLoadScript } from '@react-google-maps/api';
 import {
   tripsApi,
   daysApi,
@@ -8,6 +9,7 @@ import {
   checklistsApi,
   tripFilesApi,
 } from '../../lib/api';
+import { geocodeAddress } from '../../utils/geocode';
 import type {
   Trip,
   Day,
@@ -54,10 +56,18 @@ export function useTripDetail() {
   const [editEndDate, setEditEndDate] = useState('');
   const [editTotalBudget, setEditTotalBudget] = useState('');
   const [editCurrency, setEditCurrency] = useState('USD');
+  const [editDestination, setEditDestination] = useState('');
   const [tripNote, setTripNote] = useState('');
+  const [editBudgetOpen, setEditBudgetOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
   const [newExpenseFormOpen, setNewExpenseFormOpen] = useState(false);
+
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '';
+  const { isLoaded: isMapsLoaded } = useLoadScript({
+    googleMapsApiKey,
+    preventGoogleFontsLoading: true,
+  });
 
   const canEdit = trip?.userRole === 'owner' || trip?.userRole === 'editor';
   const isOwner = trip?.userRole === 'owner';
@@ -309,7 +319,31 @@ export function useTripDetail() {
       setEditEndDate(trip.endDate.slice(0, 10));
       setEditTotalBudget(String(trip.totalBudget ?? ''));
       setEditCurrency(trip.baseCurrency ?? 'USD');
+      setEditDestination(trip.destination ?? '');
       setEditTripOpen(true);
+    }
+  };
+
+  const openEditBudget = () => {
+    if (trip) {
+      setEditCurrency(trip.baseCurrency ?? 'USD');
+      setEditTotalBudget(String(trip.totalBudget ?? ''));
+      setEditBudgetOpen(true);
+    }
+  };
+
+  const handleSaveBudget = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    try {
+      await tripsApi.update(id, {
+        baseCurrency: editCurrency,
+        totalBudget: editTotalBudget ? Number(editTotalBudget) : undefined,
+      });
+      await loadTrip();
+      setEditBudgetOpen(false);
+    } catch (err: unknown) {
+      alert((err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Update failed');
     }
   };
 
@@ -317,12 +351,19 @@ export function useTripDetail() {
     e.preventDefault();
     if (!id) return;
     try {
+      let location: { lat: number; lng: number; zoom?: number } | undefined;
+      if (editDestination.trim() && isMapsLoaded) {
+        const geocoded = await geocodeAddress(editDestination);
+        if (geocoded) location = geocoded;
+      }
       await tripsApi.update(id, {
         title: editTitle,
         startDate: editStartDate,
         endDate: editEndDate,
         totalBudget: editTotalBudget ? Number(editTotalBudget) : undefined,
         baseCurrency: editCurrency,
+        ...(editDestination.trim() ? { destination: editDestination.trim() } : {}),
+        ...(location ? { location } : {}),
       });
       await loadTrip();
       setEditTripOpen(false);
@@ -375,6 +416,10 @@ export function useTripDetail() {
     setNewChecklistTask,
     newChecklistCategory,
     setNewChecklistCategory,
+    editBudgetOpen,
+    setEditBudgetOpen,
+    openEditBudget,
+    handleSaveBudget,
     editTripOpen,
     setEditTripOpen,
     editTitle,
@@ -387,6 +432,8 @@ export function useTripDetail() {
     setEditTotalBudget,
     editCurrency,
     setEditCurrency,
+    editDestination,
+    setEditDestination,
     tripNote,
     setTripNote,
     shareOpen,

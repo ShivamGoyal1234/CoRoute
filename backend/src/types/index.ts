@@ -15,6 +15,12 @@ export interface IBudgetCategory {
   amount: number;
 }
 
+export interface ITripLocation {
+  lat: number;
+  lng: number;
+  zoom?: number;
+}
+
 export interface ITrip {
   title: string;
   startDate: Date;
@@ -22,6 +28,8 @@ export interface ITrip {
   baseCurrency: string;
   totalBudget?: number;
   budgetCategories?: IBudgetCategory[];
+  destination?: string;
+  location?: ITripLocation;
   joinSecret?: string;
   createdBy: Types.ObjectId;
   createdAt: Date;

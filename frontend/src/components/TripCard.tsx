@@ -18,6 +18,7 @@ interface TripCardProps {
   status: TripStatus;
   mapIndex?: number;
   mapCenter?: MapCenter;
+  mapZoom?: number;
   memberCount?: number;
   members?: TripCardMember[];
 }
@@ -51,6 +52,7 @@ export function TripCard({
   status,
   mapIndex = 0,
   mapCenter,
+  mapZoom,
   memberCount = 1,
   members = [],
 }: TripCardProps) {
@@ -72,6 +74,7 @@ export function TripCard({
         <TripCardMap
           index={mapIndex}
           center={mapCenter}
+          zoom={mapZoom}
           className="absolute inset-0 w-full h-full"
         />
         <span

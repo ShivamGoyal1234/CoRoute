@@ -4,11 +4,27 @@ export const validateRegister = [
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
   body('name').trim().notEmpty().withMessage('Name is required'),
+  body('otp').isLength({ min: 4, max: 8 }).isNumeric().withMessage('Valid OTP required'),
 ];
 
 export const validateLogin = [
   body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
   body('password').notEmpty().withMessage('Password required'),
+];
+
+export const validateSendOtp = [
+  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+  body('purpose').isIn(['register', 'forgot_password']).withMessage('Purpose must be register or forgot_password'),
+];
+
+export const validateForgotPassword = [
+  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+];
+
+export const validateResetPassword = [
+  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+  body('otp').isLength({ min: 4, max: 8 }).isNumeric().withMessage('Valid OTP required'),
+  body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ];
 
 export const validateTrip = [

@@ -22,7 +22,9 @@ interface TripDetailHeaderProps {
   members: Membership[];
   section: SectionId;
   onShareClick: () => void;
+  onEditTripClick?: () => void;
   onNewExpenseClick?: () => void;
+  canEdit?: boolean;
   showLogout: boolean;
   onLogoutToggle: () => void;
   onLogout: () => void;
@@ -33,12 +35,15 @@ export function TripDetailHeader({
   members,
   section,
   onShareClick,
+  onEditTripClick,
   onNewExpenseClick,
+  canEdit,
   showLogout,
   onLogoutToggle,
   onLogout,
 }: TripDetailHeaderProps) {
   const showNewExpense = section === 'budgeting' && onNewExpenseClick;
+  const showEditTrip = section === 'itinerary' && canEdit && onEditTripClick;
   const { user: currentUser } = useAuth();
   const {
     notifications,
@@ -150,6 +155,23 @@ export function TripDetailHeader({
             }}
           >
             + New Expense
+          </button>
+        )}
+        {showEditTrip && (
+          <button
+            type="button"
+            onClick={onEditTripClick}
+            className="px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-95 flex items-center gap-2 border"
+            style={{
+              color: landingColors.primary,
+              borderColor: landingColors.primary,
+              backgroundColor: 'transparent',
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit trip
           </button>
         )}
         {!showNewExpense && (

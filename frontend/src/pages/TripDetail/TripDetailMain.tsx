@@ -1,6 +1,7 @@
 import { ItinerarySection } from './ItinerarySection';
 import { BudgetingSection } from './BudgetingSection';
 import { OrganizationSection } from './OrganizationSection';
+import { TripLocationMap } from '../../components/TripLocationMap';
 import type { useTripDetail } from './useTripDetail';
 
 type TripDetailState = ReturnType<typeof useTripDetail>;
@@ -16,15 +17,15 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
   return (
     <main className="flex-1 flex flex-col min-w-0 overflow-hidden w-full">
       {section === 'itinerary' && (
-        <div className="flex-1 flex min-w-0 overflow-hidden">
-          <div className="flex-1 min-w-0 overflow-y-auto">
-            <ItinerarySection
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+          <ItinerarySection
               days={days}
               selectedDayId={selectedDayId}
               onSelectDay={state.setSelectedDayId}
               activities={activities}
               addActivityDayId={state.addActivityDayId}
               canEdit={state.canEdit}
+              tripLocation={trip?.location}
               newActivityTitle={state.newActivityTitle}
               setNewActivityTitle={state.setNewActivityTitle}
               newActivityDescription={state.newActivityDescription}
@@ -59,8 +60,7 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
                   : undefined
               }
             />
-          </div>
-          {/* Inline side panel for activity discussion – kept for later use
+        {/* Inline side panel for activity discussion – kept for later use
           {discussionActivityId && (
             <ActivityDiscussionPanel
               activityId={discussionActivityId}
@@ -77,11 +77,12 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
         </div>
       )}
       {section === 'budgeting' && trip && (
-        <BudgetingSection
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <BudgetingSection
           trip={trip}
           stats={stats}
           canEdit={state.canEdit}
-          onEditBudget={state.openEditTrip}
+          onEditBudget={state.openEditBudget}
           newExpenseFormOpen={newExpenseFormOpen}
           onConsumeNewExpenseOpen={() => setNewExpenseFormOpen(false)}
           activitiesByDay={activitiesByDay}
@@ -92,6 +93,7 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
             await state.loadStats();
           }}
         />
+        </div>
       )}
       {section === 'organization' && trip && (
         <OrganizationSection
@@ -111,8 +113,10 @@ export function TripDetailMain({ state }: TripDetailMainProps) {
         />
       )}
       {section === 'shared-map' && (
-        <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center">
-          <p className="text-slate-500">Shared Map coming soon.</p>
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden p-6">
+          <div className="flex-1 min-h-[280px] rounded-xl overflow-hidden">
+            <TripLocationMap location={trip?.location} style={{ minHeight: '100%', height: '100%' }} showZoomControl />
+          </div>
         </div>
       )}
     </main>

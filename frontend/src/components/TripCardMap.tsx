@@ -33,8 +33,8 @@ export function TripCardMap({ index = 0, center: centerProp, zoom: zoomProp, cla
   });
 
   const { center, zoom } = useMemo(() => {
-    if (centerProp && zoomProp !== undefined) {
-      return { center: centerProp, zoom: zoomProp };
+    if (centerProp) {
+      return { center: centerProp, zoom: zoomProp ?? 12 };
     }
     const preset = PRESET_CENTERS[Math.abs(index) % PRESET_CENTERS.length];
     return { center: { lat: preset.lat, lng: preset.lng }, zoom: preset.zoom };

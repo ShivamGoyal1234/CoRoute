@@ -4,7 +4,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import path from 'path';
 import config from './config';
 import { connectDatabase } from './config/database';
 import { errorHandler, notFound } from './middleware/error.middleware';
@@ -53,8 +52,6 @@ if (config.nodeEnv === 'development') {
 } else {
   app.use(morgan('combined'));
 }
-
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.get('/health', (req: Request, res: Response) => {
   res.json({

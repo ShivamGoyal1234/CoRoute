@@ -1,25 +1,10 @@
 import { Response } from 'express';
 import multer from 'multer';
 import path from 'path';
-import fs from 'fs';
 import TripFile from '../models/TripFile';
 import Trip from '../models/Trip';
 import { AuthRequest } from '../middleware/auth.middleware';
-import config from '../config';
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = config.upload.uploadDir;
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'trip-' + uniqueSuffix + path.extname(file.originalname));
-  },
-});
+import { getFileUrlAfterUpload } from '../storage';
 
 const fileFilter = (req: unknown, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedTypes = /jpeg|jpg|png|gif|webp|pdf|doc|docx|xls|xlsx|txt/;
@@ -35,7 +20,7 @@ const fileFilter = (req: unknown, file: Express.Multer.File, cb: multer.FileFilt
 const TRIP_FILE_MAX_SIZE = 20 * 1024 * 1024; // 20MB
 
 export const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: TRIP_FILE_MAX_SIZE },
   fileFilter,
 });
@@ -50,20 +35,20 @@ export const uploadTripFile = async (req: AuthRequest, res: Response) => {
     }
 
     if (!tripId) {
-      fs.unlinkSync(req.file.path);
       return res.status(400).json({ error: 'Trip ID required' });
     }
 
     const trip = await Trip.findById(tripId);
     if (!trip) {
-      fs.unlinkSync(req.file.path);
       return res.status(404).json({ error: 'Trip not found' });
     }
+
+    const fileUrl = await getFileUrlAfterUpload(req.file);
 
     const tripFile = new TripFile({
       tripId,
       userId,
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileUrl,
       fileName: req.file.originalname,
       fileType: req.file.mimetype,
       fileSize: req.file.size,
@@ -77,9 +62,6 @@ export const uploadTripFile = async (req: AuthRequest, res: Response) => {
       file: tripFile,
     });
   } catch (error) {
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
     console.error('Upload trip file error:', error);
     res.status(500).json({ error: 'Server error' });
   }
@@ -107,11 +89,6 @@ export const deleteTripFile = async (req: AuthRequest, res: Response) => {
     const tripFile = await TripFile.findById(id);
     if (!tripFile) {
       return res.status(404).json({ error: 'File not found' });
-    }
-
-    const filePath = path.join(process.cwd(), tripFile.fileUrl);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
     }
 
     await tripFile.deleteOne();

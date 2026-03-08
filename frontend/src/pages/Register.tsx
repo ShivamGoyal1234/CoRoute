@@ -43,14 +43,37 @@ const features = (colors: ReturnType<typeof useLandingColors>) => [
 export default function Register() {
   const colors = useLandingColors();
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const { sendOtp, register } = useAuth();
   const navigate = useNavigate();
+
+  const handleSendOtp = async () => {
+    if (!email.trim()) {
+      setError('Please enter your email');
+      return;
+    }
+    setError('');
+    setSendingOtp(true);
+    try {
+      await sendOtp(email.trim(), 'register');
+      setOtpSent(true);
+    } catch (err: unknown) {
+      const message = err && typeof err === 'object' && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+        : undefined;
+      setError(message ?? 'Failed to send OTP');
+    } finally {
+      setSendingOtp(false);
+    }
+  };
 
   const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,10 +104,14 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!otpSent || !otp.trim()) {
+      setError('Please request and enter the verification code from your email.');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
-      await register(email, password, name, profilePic ?? undefined);
+      await register(email, password, name, otp.trim(), profilePic ?? undefined);
       navigate('/dashboard', { replace: true });
     } catch (err: unknown) {
       const message = err && typeof err === 'object' && 'response' in err
@@ -201,9 +228,68 @@ export default function Register() {
 
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
-                Full Name
+                Email Address
               </label>
-              <div className="relative">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    readOnly={otpSent}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow disabled:bg-slate-50 disabled:text-slate-600"
+                    placeholder="name@company.com"
+                  />
+                </div>
+                {!otpSent ? (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={sendingOtp}
+                    className="py-2.5 px-4 rounded-lg font-medium text-white whitespace-nowrap disabled:opacity-50"
+                    style={{ background: colors.primary }}
+                  >
+                    {sendingOtp ? 'Sending…' : 'Send OTP'}
+                  </button>
+                ) : null}
+              </div>
+              {otpSent && (
+                <p className="mt-1 text-xs" style={{ color: colors.textMuted }}>
+                  Verification code sent. Check your inbox.
+                </p>
+              )}
+            </div>
+
+            {otpSent && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
+                    Verification code
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
+                    Full Name
+                  </label>
+                  <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -217,13 +303,13 @@ export default function Register() {
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
                   placeholder="John Doe"
                 />
-              </div>
-            </div>
+                  </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
-                Profile picture (optional)
-              </label>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
+                    Profile picture (optional)
+                  </label>
               <div className="flex items-center gap-4">
                 <input
                   type="file"
@@ -264,33 +350,12 @@ export default function Register() {
                   )}
                 </div>
               </div>
-            </div>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
-                Email Address
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </span>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/20 focus:border-[#8B5CF6] transition-shadow"
-                  placeholder="name@company.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
-                Password
-              </label>
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: colors.text }}>
+                    Password
+                  </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden>
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -310,24 +375,26 @@ export default function Register() {
               <p className="mt-1.5 text-xs" style={{ color: colors.textMuted }}>
                 Must be at least 8 characters long.
               </p>
-            </div>
+                </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-opacity hover:opacity-95 disabled:opacity-50"
-              style={{
-                background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryHeader} 100%)`,
-                boxShadow: '0 8px 24px 0 rgba(139, 92, 246, 0.3)',
-              }}
-            >
-              {loading ? 'Creating account…' : 'Create Account'}
-              {!loading && (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              )}
-            </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl font-semibold text-white flex items-center justify-center gap-2 transition-opacity hover:opacity-95 disabled:opacity-50"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.primaryHeader} 100%)`,
+                    boxShadow: '0 8px 24px 0 rgba(139, 92, 246, 0.3)',
+                  }}
+                >
+                  {loading ? 'Creating account…' : 'Create Account'}
+                  {!loading && (
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  )}
+                </button>
+              </>
+            )}
           </form>
 
           <div className="flex items-center gap-3 my-6">

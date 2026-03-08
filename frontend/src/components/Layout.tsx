@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, NavLink, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './index';
 import { TripNotificationToaster } from './TripNotificationToaster';
@@ -49,10 +50,23 @@ function NavIcon({ name }: { name: string }) {
 }
 
 export const Layout = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const isTripBuilder = isTripDetailPath(location.pathname);
   const colors = useLandingColors();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [profileOpen]);
 
   return (
     <div
@@ -85,7 +99,7 @@ export const Layout = () => {
               <NavLink
                 key={item.label}
                 to={item.to}
-                end={item.to === '/dashboard'}
+                end
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive ? '' : 'hover:opacity-90'}`}
@@ -117,29 +131,69 @@ export const Layout = () => {
               </svg>
               Settings
             </Link>
-            <div
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
-              style={{ backgroundColor: colors.background }}
-            >
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0"
-                style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primaryHeader }}
-                title={user.email}
+            <div className="relative" ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => setProfileOpen((o) => !o)}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-opacity hover:opacity-90 focus:outline-none"
+                style={{ backgroundColor: colors.background }}
+                aria-expanded={profileOpen}
+                aria-haspopup="true"
               >
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
-                ) : (
-                  getInitials(user.name)
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate" style={{ color: colors.text }}>
-                  {user.name}
-                </p>
-                <p className="text-xs truncate" style={{ color: colors.textMuted }}>
-                  Premium Plan
-                </p>
-              </div>
+                <div
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0"
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primaryHeader }}
+                  title={user.email}
+                >
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    getInitials(user.name)
+                  )}
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-sm font-medium truncate" style={{ color: colors.text }}>
+                    {user.name}
+                  </p>
+                  <p className="text-xs truncate" style={{ color: colors.textMuted }}>
+                    Premium Plan
+                  </p>
+                </div>
+                <svg
+                  className={`w-4 h-4 shrink-0 transition-transform ${profileOpen ? 'rotate-180' : ''}`}
+                  style={{ color: colors.textMuted }}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {profileOpen && (
+                <div
+                  className="absolute bottom-full left-0 right-0 mb-1 py-1 rounded-lg border shadow-lg z-50"
+                  style={{
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors hover:opacity-90 text-left focus:outline-none rounded-lg"
+                    style={{ color: colors.textMuted }}
+                  >
+                    <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </aside>

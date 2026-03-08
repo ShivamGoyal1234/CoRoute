@@ -203,7 +203,7 @@ export function BudgetingSection({
   const borderStyle = { borderColor: 'rgba(226, 232, 240, 0.8)' };
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-6 w-full" style={{ backgroundColor: '#F6F5F8' }}>
+    <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-6 py-6 w-full" style={{ backgroundColor: '#F6F5F8' }}>
       <div className="max-w-6xl">
         <div className="flex items-center gap-4 mb-1">
           <h1 className="text-4xl font-bold" style={{ color: landingColors.text }}>

@@ -172,6 +172,8 @@ export default function Dashboard() {
                   trip={trip}
                   status={getTripStatus(trip)}
                   mapIndex={i}
+                  mapCenter={trip.location ? { lat: trip.location.lat, lng: trip.location.lng } : undefined}
+                  mapZoom={trip.location?.zoom}
                   memberCount={trip.travelerCount}
                   members={trip.travelers?.map((t) => ({ name: t.name, avatarUrl: t.avatarUrl }))}
                 />

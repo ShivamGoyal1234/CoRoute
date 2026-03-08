@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useLoadScript } from '@react-google-maps/api';
 import { tripsApi, membersApi } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import type { MemberRole } from '../types';
 import { landingColors } from '../landing/theme';
 import { getInitials } from '../utils/helpers';
+import { geocodeAddress } from '../utils/geocode';
 
 const TRIP_DRAFT_KEY = 'coroute_trip_draft';
 const STEPS = ['Basics', 'Budget', 'Invite'];
@@ -30,9 +32,15 @@ interface BudgetCategory {
   amount: string;
 }
 
+const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '';
+
 export default function NewTrip() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
+  const { isLoaded: isMapsLoaded } = useLoadScript({
+    googleMapsApiKey,
+    preventGoogleFontsLoading: true,
+  });
   const [title, setTitle] = useState('');
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -140,6 +148,11 @@ export default function NewTrip() {
       }
       setLoading(true);
       try {
+        let location: { lat: number; lng: number; zoom?: number } | undefined;
+        if (destination.trim() && isMapsLoaded) {
+          const geocoded = await geocodeAddress(destination);
+          if (geocoded) location = geocoded;
+        }
         const { data } = await tripsApi.create({
           title: title || 'Untitled Adventure',
           startDate,
@@ -152,6 +165,8 @@ export default function NewTrip() {
             description: c.description || undefined,
             amount: Number(c.amount) || 0,
           })),
+          ...(destination.trim() ? { destination: destination.trim() } : {}),
+          ...(location ? { location } : {}),
         });
         setCreatedTripId(data.trip._id);
         setJoinSecret(data.trip.joinSecret ?? null);
@@ -392,7 +407,7 @@ export default function NewTrip() {
 
             {/* Step 2: Budget */}
             {currentStep === 2 && (
-              <>
+              <div className="max-h-[65vh] overflow-y-auto overflow-x-hidden pr-1">
                 <section className="mb-6 p-4 rounded-xl grid grid-cols-2 gap-4" style={{ backgroundColor: 'rgba(248, 250, 252, 0.8)' }}>
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: landingColors.text }}>
@@ -502,7 +517,7 @@ export default function NewTrip() {
                     />
                   </button>
                 </section>
-              </>
+              </div>
             )}
 
             {/* Step 3: Invite Your Squad */}

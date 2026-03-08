@@ -4,6 +4,8 @@ interface EditTripModalProps {
   isOpen: boolean;
   title: string;
   onTitleChange: (v: string) => void;
+  destination: string;
+  onDestinationChange: (v: string) => void;
   startDate: string;
   onStartDateChange: (v: string) => void;
   endDate: string;
@@ -22,6 +24,8 @@ export function EditTripModal({
   isOpen,
   title,
   onTitleChange,
+  destination,
+  onDestinationChange,
   startDate,
   onStartDateChange,
   endDate,
@@ -39,7 +43,7 @@ export function EditTripModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <form
         onSubmit={onSave}
-        className="rounded-xl border bg-white dark:bg-slate-800 p-6 w-full max-w-md shadow-xl space-y-3"
+        className="rounded-xl border bg-white dark:bg-slate-800 p-6 w-full max-w-md shadow-xl space-y-3 max-h-[90vh] overflow-y-auto"
         style={inputBorder}
       >
         <h2 className="font-semibold text-lg" style={{ color: landingColors.text }}>Edit trip</h2>
@@ -52,6 +56,19 @@ export function EditTripModal({
           className="w-full px-3 py-2 rounded-lg border text-sm"
           style={inputBorder}
         />
+        <div>
+          <input
+            type="text"
+            value={destination}
+            onChange={(e) => onDestinationChange(e.target.value)}
+            placeholder="Where are you going? (city, country or region)"
+            className="w-full px-3 py-2 rounded-lg border text-sm"
+            style={inputBorder}
+          />
+          <p className="text-xs mt-1" style={{ color: landingColors.textMuted }}>
+            Used for the map on dashboard and trip detail.
+          </p>
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <input
             type="date"

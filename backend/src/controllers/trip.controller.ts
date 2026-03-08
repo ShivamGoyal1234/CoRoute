@@ -17,7 +17,7 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { title, startDate, endDate, baseCurrency, totalBudget, budgetCategories: rawCategories } = req.body;
+    const { title, startDate, endDate, baseCurrency, totalBudget, budgetCategories: rawCategories, destination, location: locationBody } = req.body;
     const userId = req.user?.userId;
     const joinSecret = crypto.randomBytes(16).toString('hex');
 
@@ -32,6 +32,17 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
           }))
       : undefined;
 
+    const location =
+      locationBody &&
+      typeof locationBody.lat === 'number' &&
+      typeof locationBody.lng === 'number'
+        ? {
+            lat: locationBody.lat,
+            lng: locationBody.lng,
+            ...(typeof locationBody.zoom === 'number' ? { zoom: locationBody.zoom } : {}),
+          }
+        : undefined;
+
     const trip = new Trip({
       title,
       startDate,
@@ -39,6 +50,8 @@ export const createTrip = async (req: AuthRequest, res: Response) => {
       baseCurrency: baseCurrency || 'USD',
       totalBudget: totalBudget ?? 0,
       ...(budgetCategories?.length ? { budgetCategories } : {}),
+      ...(destination != null && String(destination).trim() ? { destination: String(destination).trim() } : {}),
+      ...(location ? { location } : {}),
       joinSecret,
       createdBy: userId,
     });
@@ -191,7 +204,7 @@ export const sendTripMessage = async (req: AuthRequest, res: Response) => {
 export const updateTrip = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, startDate, endDate, baseCurrency, totalBudget, budgetCategories: rawCategories } = req.body;
+    const { title, startDate, endDate, baseCurrency, totalBudget, budgetCategories: rawCategories, destination, location: locationBody } = req.body;
 
     const update: Record<string, unknown> = { title, startDate, endDate, baseCurrency, totalBudget };
     if (Array.isArray(rawCategories)) {
@@ -203,6 +216,20 @@ export const updateTrip = async (req: AuthRequest, res: Response) => {
           description: c.description ? String(c.description).trim() : undefined,
           amount: Number(c.amount) || 0,
         }));
+    }
+    if (destination !== undefined) {
+      update.destination = destination == null || String(destination).trim() === '' ? undefined : String(destination).trim();
+    }
+    if (locationBody !== undefined) {
+      if (locationBody && typeof locationBody.lat === 'number' && typeof locationBody.lng === 'number') {
+        update.location = {
+          lat: locationBody.lat,
+          lng: locationBody.lng,
+          ...(typeof locationBody.zoom === 'number' ? { zoom: locationBody.zoom } : {}),
+        };
+      } else {
+        update.location = undefined;
+      }
     }
 
     const trip = await Trip.findByIdAndUpdate(

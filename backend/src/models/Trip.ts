@@ -27,6 +27,19 @@ const tripSchema = new Schema<ITripDocument>(
       type: Number,
       default: 0,
     },
+    destination: {
+      type: String,
+      trim: true,
+      default: undefined,
+    },
+    location: {
+      type: {
+        lat: { type: Number, required: true },
+        lng: { type: Number, required: true },
+        zoom: { type: Number, default: undefined },
+      },
+      default: undefined,
+    },
     budgetCategories: {
       type: [
         {

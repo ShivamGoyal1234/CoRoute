@@ -2,6 +2,7 @@ import api from './axios';
 import type {
   User,
   Trip,
+  TripLocation,
   BudgetCategory,
   Membership,
   Day,
@@ -23,8 +24,14 @@ const baseURL = import.meta.env.VITE_API_URL
 export const authApi = {
   login: (email: string, password: string) =>
     api.post<{ token: string; user: User }>('/auth/login', { email, password }),
-  register: (data: { email: string; password: string; name: string; avatarUrl?: string }) =>
+  sendOtp: (email: string, purpose: 'register' | 'forgot_password') =>
+    api.post<{ message: string }>('/auth/send-otp', { email, purpose }),
+  register: (data: { email: string; password: string; name: string; otp: string; avatarUrl?: string }) =>
     api.post<{ token: string; user: User }>('/auth/register', data),
+  forgotPassword: (email: string) =>
+    api.post<{ message: string }>('/auth/forgot-password', { email }),
+  resetPassword: (email: string, otp: string, newPassword: string) =>
+    api.post<{ message: string }>('/auth/reset-password', { email, otp, newPassword }),
   me: () => api.get<{ user: User }>('/auth/me'),
 };
 
@@ -39,8 +46,10 @@ export const tripsApi = {
     baseCurrency?: string;
     totalBudget?: number;
     budgetCategories?: BudgetCategory[];
+    destination?: string;
+    location?: TripLocation;
   }) => api.post<{ trip: Trip }>('/trips', data),
-  update: (id: string, data: Partial<Pick<Trip, 'title' | 'startDate' | 'endDate' | 'baseCurrency' | 'totalBudget' | 'budgetCategories'>>) =>
+  update: (id: string, data: Partial<Pick<Trip, 'title' | 'startDate' | 'endDate' | 'baseCurrency' | 'totalBudget' | 'budgetCategories' | 'destination' | 'location'>>) =>
     api.put<{ trip: Trip }>(`/trips/${id}`, data),
   delete: (id: string) => api.delete(`/trips/${id}`),
   stats: (id: string) => api.get<{ stats: TripStats }>(`/trips/${id}/stats`),

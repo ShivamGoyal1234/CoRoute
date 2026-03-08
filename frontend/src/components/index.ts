@@ -8,3 +8,4 @@ export { ActivityDetailModal } from './ActivityDetailModal';
 export { InviteMemberForm } from './InviteMemberForm';
 export { TripCardMap } from './TripCardMap';
 export { TripCard } from './TripCard';
+export { TripLocationMap } from './TripLocationMap';

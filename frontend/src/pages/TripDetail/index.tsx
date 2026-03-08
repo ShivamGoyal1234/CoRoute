@@ -14,6 +14,7 @@ import { TripDetailMain } from './TripDetailMain';
 import { CollaborationFeed } from './CollaborationFeed';
 import { ShareTripModal } from './ShareTripModal';
 import { EditTripModal } from './EditTripModal';
+import { EditBudgetModal } from './EditBudgetModal';
 
 const SECTION_LABELS: Record<string, string> = {
   itinerary: 'Itinerary',
@@ -54,10 +55,15 @@ export default function TripDetailPage() {
     setShareOpen,
     showLogout,
     setShowLogout,
+    editBudgetOpen,
+    setEditBudgetOpen,
+    handleSaveBudget,
     editTripOpen,
     setEditTripOpen,
     editTitle,
     setEditTitle,
+    editDestination,
+    setEditDestination,
     editStartDate,
     setEditStartDate,
     editEndDate,
@@ -120,7 +126,9 @@ export default function TripDetailPage() {
           members={members}
           section={section}
           onShareClick={() => setShareOpen(true)}
+          onEditTripClick={state.openEditTrip}
           onNewExpenseClick={() => state.setNewExpenseFormOpen(true)}
+          canEdit={canEdit}
           showLogout={showLogout}
           onLogoutToggle={() => setShowLogout((p) => !p)}
           onLogout={logout}
@@ -146,6 +154,8 @@ export default function TripDetailPage() {
         isOpen={editTripOpen}
         title={editTitle}
         onTitleChange={setEditTitle}
+        destination={editDestination}
+        onDestinationChange={setEditDestination}
         startDate={editStartDate}
         onStartDateChange={setEditStartDate}
         endDate={editEndDate}
@@ -156,6 +166,16 @@ export default function TripDetailPage() {
         onTotalBudgetChange={setEditTotalBudget}
         onSave={state.handleSaveTrip}
         onClose={() => setEditTripOpen(false)}
+      />
+
+      <EditBudgetModal
+        isOpen={editBudgetOpen}
+        currency={editCurrency}
+        onCurrencyChange={setEditCurrency}
+        totalBudget={editTotalBudget}
+        onTotalBudgetChange={setEditTotalBudget}
+        onSave={handleSaveBudget}
+        onClose={() => setEditBudgetOpen(false)}
       />
 
       <ShareTripModal

@@ -18,6 +18,12 @@ export interface BudgetCategory {
   amount: number;
 }
 
+export interface TripLocation {
+  lat: number;
+  lng: number;
+  zoom?: number;
+}
+
 export interface Trip {
   _id: string;
   title: string;
@@ -26,6 +32,8 @@ export interface Trip {
   baseCurrency: string;
   totalBudget?: number;
   budgetCategories?: BudgetCategory[];
+  destination?: string;
+  location?: TripLocation;
   joinSecret?: string;
   createdBy: User | string;
   createdAt?: string;

@@ -1,6 +1,7 @@
 import { Reorder } from 'framer-motion';
 import { landingColors } from '../../landing/theme';
-import type { Day, Activity } from '../../types';
+import type { Day, Activity, TripLocation } from '../../types';
+import { TripLocationMap } from '../../components/TripLocationMap';
 import { ActivityTimelineCard } from './ActivityTimelineCard';
 import { AddActivityForm } from './AddActivityForm';
 
@@ -11,6 +12,7 @@ interface ItinerarySectionProps {
   activities: Activity[];
   addActivityDayId: string | null;
   canEdit: boolean;
+  tripLocation?: TripLocation | null;
   newActivityTitle: string;
   setNewActivityTitle: (v: string) => void;
   newActivityDescription: string;
@@ -49,6 +51,7 @@ export function ItinerarySection({
   activities,
   addActivityDayId,
   canEdit,
+  tripLocation,
   newActivityTitle,
   setNewActivityTitle,
   newActivityDescription,
@@ -151,64 +154,68 @@ export function ItinerarySection({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-4 w-full">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
         {selectedDayId ? (
-          <div className="w-full">
-            <div className="relative pl-8">
-              <div
-                className="absolute left-[11px] top-2 bottom-2 w-0.5 rounded-full"
-                style={{ backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
-              />
-              {activities.length === 0 && !addActivityDayId && (
-                <p className="text-sm py-6" style={{ color: landingColors.textMuted }}>
-                  No activities yet for this day.
-                </p>
-              )}
-              {canEdit && onReorderActivities && activities.length > 0 ? (
-                <Reorder.Group
-                  axis="y"
-                  values={activities}
-                  onReorder={onReorderActivities}
-                  className="space-y-0"
-                >
-                  {activities.map((activity, idx) => (
-                    <Reorder.Item
+          <>
+            <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-6 py-4 w-full">
+              <div className="relative pl-8">
+                <div
+                  className="absolute left-[11px] top-2 bottom-2 w-0.5 rounded-full"
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.3)' }}
+                />
+                {activities.length === 0 && !addActivityDayId && (
+                  <p className="text-sm py-6" style={{ color: landingColors.textMuted }}>
+                    No activities yet for this day.
+                  </p>
+                )}
+                {canEdit && onReorderActivities && activities.length > 0 ? (
+                  <Reorder.Group
+                    axis="y"
+                    values={activities}
+                    onReorder={onReorderActivities}
+                    className="space-y-0"
+                  >
+                    {activities.map((activity, idx) => (
+                      <Reorder.Item
+                        key={activity._id}
+                        value={activity}
+                        className="cursor-grab active:cursor-grabbing list-none"
+                      >
+                        <ActivityTimelineCard
+                          activity={activity as any}
+                          index={idx}
+                          onOpenDetail={() => onOpenActivity(activity._id)}
+                          onOpenChat={onOpenChat}
+                          onCloseDiscussion={onCloseDiscussion}
+                          isDiscussionOpen={discussionActivityId === activity._id}
+                          canEdit={canEdit}
+                          onDiscussionUpdate={onDiscussionUpdate}
+                          showDragHandle
+                          useRealtimeTyping
+                        />
+                      </Reorder.Item>
+                    ))}
+                  </Reorder.Group>
+                ) : (
+                  activities.map((activity, idx) => (
+                    <ActivityTimelineCard
                       key={activity._id}
-                      value={activity}
-                      className="cursor-grab active:cursor-grabbing list-none"
-                    >
-                      <ActivityTimelineCard
-                        activity={activity as any}
-                        index={idx}
-                        onOpenDetail={() => onOpenActivity(activity._id)}
-                        onOpenChat={onOpenChat}
-                        onCloseDiscussion={onCloseDiscussion}
-                        isDiscussionOpen={discussionActivityId === activity._id}
-                        canEdit={canEdit}
-                        onDiscussionUpdate={onDiscussionUpdate}
-                        showDragHandle
-                        useRealtimeTyping
-                      />
-                    </Reorder.Item>
-                  ))}
-                </Reorder.Group>
-              ) : (
-                activities.map((activity, idx) => (
-                  <ActivityTimelineCard
-                    key={activity._id}
-                    activity={activity as any}
-                    index={idx}
-                    onOpenDetail={() => onOpenActivity(activity._id)}
-                    onOpenChat={onOpenChat}
-                    onCloseDiscussion={onCloseDiscussion}
-                    isDiscussionOpen={discussionActivityId === activity._id}
-                    canEdit={canEdit}
-                    onDiscussionUpdate={onDiscussionUpdate}
-                    useRealtimeTyping
-                  />
-                ))
-              )}
+                      activity={activity as any}
+                      index={idx}
+                      onOpenDetail={() => onOpenActivity(activity._id)}
+                      onOpenChat={onOpenChat}
+                      onCloseDiscussion={onCloseDiscussion}
+                      isDiscussionOpen={discussionActivityId === activity._id}
+                      canEdit={canEdit}
+                      onDiscussionUpdate={onDiscussionUpdate}
+                      useRealtimeTyping
+                    />
+                  ))
+                )}
+              </div>
+            </div>
 
+            <div className="shrink-0 px-6 pb-4 space-y-4">
               {addActivityDayId === selectedDayId ? (
                 <AddActivityForm
                   title={newActivityTitle}
@@ -225,7 +232,7 @@ export function ItinerarySection({
                   onCancel={onResetNewActivityForm}
                 />
               ) : canEdit ? (
-                <div className="flex justify-center pt-4">
+                <div className="flex justify-center">
                   <button
                     type="button"
                     onClick={() => setAddActivityDayId(selectedDayId)}
@@ -242,28 +249,21 @@ export function ItinerarySection({
                   </button>
                 </div>
               ) : null}
-            </div>
 
-            <div className="mt-8 rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(226, 232, 240, 0.8)', backgroundColor: '#f1f5f9' }}>
-              <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-                <span className="text-sm font-medium" style={{ color: landingColors.text }}>
-                  Map Preview
-                </span>
-                <button type="button" className="p-1.5 rounded hover:bg-slate-200/50" aria-label="Full screen">
-                  <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                  </svg>
-                </button>
-              </div>
-              <div className="h-48 flex items-center justify-center" style={{ backgroundColor: '#e2e8f0' }}>
-                <p className="text-sm" style={{ color: landingColors.textMuted }}>
-                  Map will show trip locations
-                </p>
+              <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
+                <div className="flex items-center justify-between px-4 py-2 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
+                  <span className="text-sm font-medium" style={{ color: landingColors.text }}>
+                    Map Preview
+                  </span>
+                </div>
+                <TripLocationMap location={tripLocation} style={{ minHeight: 192, height: 192 }} showZoomControl={false} />
               </div>
             </div>
-          </div>
+          </>
         ) : (
-          <p className="text-slate-500 dark:text-slate-400">Select a day or add one to build your itinerary.</p>
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <p className="text-slate-500 dark:text-slate-400">Select a day or add one to build your itinerary.</p>
+          </div>
         )}
       </div>
     </>
