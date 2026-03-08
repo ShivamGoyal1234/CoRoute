@@ -11,7 +11,6 @@ import { canView, isOwner } from '../middleware/permission.middleware';
 
 const router = Router();
 
-// All routes require authentication
 router.use(authenticate);
 
 router.post('/:tripId/invite', isOwner, inviteMember);

@@ -11,8 +11,7 @@ import { validateComment } from '../utils/validators';
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticate);
+router.use(authenticate); 
 
 router.post('/', canView, validateComment, createComment);
 router.get('/activity/:activityId', canView, getCommentsByActivity);

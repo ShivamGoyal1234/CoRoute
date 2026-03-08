@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import {
   uploadTripFile,
   getTripFiles,
@@ -13,7 +13,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post('/', upload.single('file'), canEdit, uploadTripFile);
+router.post('/', upload.single('file') as RequestHandler, canEdit, uploadTripFile);
 router.get('/trip/:tripId', canView, getTripFiles);
 router.delete('/:id', async (req, res, next) => {
   try {

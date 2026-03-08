@@ -12,7 +12,6 @@ import { validateDay } from '../utils/validators';
 
 const router = Router();
 
-// All routes require authentication
 router.use(authenticate);
 
 router.post('/', canEdit, validateDay, createDay);

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, RequestHandler } from 'express';
 import {
   uploadAttachment,
   getAttachmentsByActivity,
@@ -10,10 +10,9 @@ import { canView } from '../middleware/permission.middleware';
 
 const router = Router();
 
-// All routes require authentication
 router.use(authenticate);
 
-router.post('/', upload.single('file'), uploadAttachment);
+router.post('/', upload.single('file') as RequestHandler, uploadAttachment);
 router.get('/activity/:activityId', canView, getAttachmentsByActivity);
 router.delete('/:id', authenticate, deleteAttachment);
 
