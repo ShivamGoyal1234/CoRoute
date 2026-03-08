@@ -229,8 +229,7 @@ className="relative flex items-center gap-2 pl-2 border-l"
             <button
               type="button"
               className="relative w-9 h-9 rounded-full flex items-center justify-center text-sm font-medium shrink-0 focus:outline-none overflow-visible border-2"
-              style={{ borderColor: colors.border }}
-              style={{ backgroundColor: '#e8d5c4' }}
+              style={{ borderColor: colors.border, backgroundColor: '#e8d5c4' }}
               title={currentUser.email}
               onClick={onLogoutToggle}
             >
