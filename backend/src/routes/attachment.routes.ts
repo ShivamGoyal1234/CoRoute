@@ -12,7 +12,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post('/', upload.single('file') as RequestHandler, uploadAttachment);
+router.post('/', upload.single('file') as unknown as RequestHandler, uploadAttachment);
 router.get('/activity/:activityId', canView, getAttachmentsByActivity);
 router.delete('/:id', authenticate, deleteAttachment);
 

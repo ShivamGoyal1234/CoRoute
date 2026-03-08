@@ -5,7 +5,7 @@ import { validateRegister, validateLogin } from '../utils/validators';
 
 const router = Router();
 
-router.post('/register', uploadAvatar.single('avatar') as RequestHandler, validateRegister, register);
+router.post('/register', uploadAvatar.single('avatar') as unknown as RequestHandler, validateRegister, register);
 router.post('/login', validateLogin, login);
 
 router.get('/me', authenticate, getMe);

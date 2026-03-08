@@ -13,7 +13,7 @@ const router = Router();
 
 router.use(authenticate);
 
-router.post('/', upload.single('file') as RequestHandler, canEdit, uploadTripFile);
+router.post('/', upload.single('file') as unknown as RequestHandler, canEdit, uploadTripFile);
 router.get('/trip/:tripId', canView, getTripFiles);
 router.delete('/:id', async (req, res, next) => {
   try {
