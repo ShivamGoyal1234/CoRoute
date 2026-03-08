@@ -16,9 +16,9 @@ import type {
   ChecklistCategory,
 } from '../types';
 
-const baseURL = import.meta.env.DEV
-  ? '/api'
-  : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
+const baseURL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : (import.meta.env.DEV ? '/api' : '');
 
 export const authApi = {
   login: (email: string, password: string) =>

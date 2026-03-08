@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// In dev, use relative /api so Vite proxy forwards to backend (no CORS)
-const baseURL = import.meta.env.DEV
-  ? '/api'
-  : (import.meta.env.VITE_API_URL || 'http://localhost:3000/api');
+// Use VITE_API_URL when set (dev or prod); otherwise in dev use /api so Vite proxy forwards
+const baseURL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : (import.meta.env.DEV ? '/api' : '');
 
 const api = axios.create({
   baseURL,

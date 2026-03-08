@@ -27,12 +27,7 @@ connectDatabase();
 
 app.use(helmet());
 
-app.use(
-  cors({
-    origin: config.cors.origin,
-    credentials: true,
-  })
-);
+
 
 // const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000, 
@@ -40,6 +35,15 @@ app.use(
 //   message: 'Too many requests from this IP, please try again later.',
 // });
 // app.use('/api', limiter);
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
