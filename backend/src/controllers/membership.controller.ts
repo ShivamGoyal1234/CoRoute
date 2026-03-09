@@ -93,15 +93,23 @@ export const updateMemberRole = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Valid role required' });
     }
 
-    const membership = await Membership.findByIdAndUpdate(
-      id,
-      { role },
-      { new: true }
-    ).populate('userId', 'name email avatarUrl');
+    const membership = await Membership.findById(id).populate('userId', 'name email avatarUrl');
 
     if (!membership) {
       return res.status(404).json({ error: 'Membership not found' });
     }
+
+    const trip = await Trip.findById(membership.tripId);
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+
+    if (trip.createdBy.toString() !== req.user?.userId) {
+      return res.status(403).json({ error: 'Owner access required' });
+    }
+
+    membership.role = role;
+    await membership.save();
 
     res.json({ message: 'Role updated', membership });
   } catch (error) {
@@ -121,6 +129,15 @@ export const removeMember = async (req: AuthRequest, res: Response) => {
 
     if (membership.role === MemberRole.OWNER) {
       return res.status(400).json({ error: 'Cannot remove trip owner' });
+    }
+
+    const trip = await Trip.findById(membership.tripId);
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+
+    if (trip.createdBy.toString() !== req.user?.userId) {
+      return res.status(403).json({ error: 'Owner access required' });
     }
 
     const tripId = membership.tripId.toString();

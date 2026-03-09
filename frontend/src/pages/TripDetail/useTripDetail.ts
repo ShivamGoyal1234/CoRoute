@@ -21,9 +21,11 @@ import type {
   MemberRole,
 } from '../../types';
 import type { SectionId } from './types';
+import { useSocket } from '../../contexts/SocketContext';
 
 export function useTripDetail() {
   const { id } = useParams<{ id: string }>();
+  const { onTripNotification } = useSocket();
 
   const [trip, setTrip] = useState<(Trip & { userRole?: MemberRole }) | null>(null);
   const [members, setMembers] = useState<Membership[]>([]);
@@ -42,6 +44,7 @@ export function useTripDetail() {
   const [newDayNumber, setNewDayNumber] = useState(1);
   const [newDayDate, setNewDayDate] = useState('');
   const [newDayNotes, setNewDayNotes] = useState('');
+  const [newDayError, setNewDayError] = useState<string | null>(null);
   const [addActivityDayId, setAddActivityDayId] = useState<string | null>(null);
   const [newActivityTitle, setNewActivityTitle] = useState('');
   const [newActivityDescription, setNewActivityDescription] = useState('');
@@ -153,6 +156,7 @@ export function useTripDetail() {
     e.preventDefault();
     if (!id || !newDayDate) return;
     try {
+      setNewDayError(null);
       await daysApi.create({ tripId: id, dayNumber: newDayNumber, date: newDayDate, notes: newDayNotes || undefined });
       await loadTrip();
       setAddDayOpen(false);
@@ -160,7 +164,10 @@ export function useTripDetail() {
       setNewDayDate('');
       setNewDayNotes('');
     } catch (err: unknown) {
-      alert((err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to add day');
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+        'Failed to add day';
+      setNewDayError(msg);
     }
   };
 
@@ -296,6 +303,34 @@ export function useTripDetail() {
     }
   };
 
+  useEffect(() => {
+    if (!id) return;
+    const unsubscribe = onTripNotification((notification) => {
+      if (notification.metadata?.tripId !== id) return;
+
+      if (
+        notification.type === 'activity_added' ||
+        notification.type === 'activity_updated' ||
+        notification.type === 'activity_deleted'
+      ) {
+        // Refresh everything touched by activities so itinerary and budgeting stay in sync
+        loadTrip();
+        loadActivities();
+        loadStats();
+      }
+
+      if (
+        notification.type === 'day_added' ||
+        notification.type === 'day_deleted'
+      ) {
+        loadTrip();
+        loadActivities();
+        loadStats();
+      }
+    });
+    return unsubscribe;
+  }, [id, onTripNotification, loadTrip, loadActivities, loadStats]);
+
   const handleInvite = async (email: string, role: MemberRole) => {
     if (!id) return;
     await membersApi.invite(id, email, role);
@@ -398,6 +433,8 @@ export function useTripDetail() {
     setNewDayNumber,
     newDayDate,
     setNewDayDate,
+    newDayError,
+    setNewDayError,
     newDayNotes,
     setNewDayNotes,
     addActivityDayId,

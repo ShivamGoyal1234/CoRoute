@@ -15,8 +15,8 @@ router.use(authenticate);
 
 router.post('/:tripId/invite', isOwner, inviteMember);
 router.get('/:tripId', canView, getTripMembers);
-router.put('/:id/role', isOwner, updateMemberRole);
-router.delete('/:id', isOwner, removeMember);
+router.put('/:id/role', updateMemberRole);
+router.delete('/:id', removeMember);
 router.post('/:tripId/leave', authenticate, leavTrip);
 
 export default router;

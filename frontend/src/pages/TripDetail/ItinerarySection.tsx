@@ -29,6 +29,10 @@ interface ItinerarySectionProps {
   setNewDayNumber: (v: number) => void;
   newDayDate: string;
   setNewDayDate: (v: string) => void;
+  tripStartDate?: string;
+  tripEndDate?: string;
+  newDayError?: string | null;
+  clearNewDayError?: () => void;
   newDayNotes?: string;
   setNewDayNotes?: (v: string) => void;
   onAddDay: (e: React.FormEvent) => void;
@@ -68,6 +72,10 @@ export function ItinerarySection({
   setNewDayNumber,
   newDayDate,
   setNewDayDate,
+  tripStartDate,
+  tripEndDate,
+  newDayError,
+  clearNewDayError,
   newDayNotes: _newDayNotes = '',
   setNewDayNotes: _setNewDayNotes,
   onAddDay,
@@ -83,6 +91,8 @@ export function ItinerarySection({
   onReorderActivities,
 }: ItinerarySectionProps) {
   const colors = useLandingColors();
+  const minDate = tripStartDate ? tripStartDate.slice(0, 10) : undefined;
+  const maxDate = tripEndDate ? tripEndDate.slice(0, 10) : undefined;
   return (
     <>
       <div
@@ -130,24 +140,51 @@ export function ItinerarySection({
                     type="number"
                     min={1}
                     value={newDayNumber}
-                    onChange={(e) => setNewDayNumber(Number(e.target.value))}
+                    onChange={(e) => {
+                      if (clearNewDayError) clearNewDayError();
+                      setNewDayNumber(Number(e.target.value));
+                    }}
                     className="w-14 px-2 py-1.5 rounded border text-sm"
                     style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                   />
                   <input
                     type="date"
                     value={newDayDate}
-                    onChange={(e) => setNewDayDate(e.target.value)}
+                    onChange={(e) => {
+                      if (clearNewDayError) clearNewDayError();
+                      setNewDayDate(e.target.value);
+                    }}
                     required
+                    min={minDate}
+                    max={maxDate}
                     className="px-2 py-1.5 rounded border text-sm"
                     style={{ borderColor: colors.border, backgroundColor: colors.surface, color: colors.text }}
                   />
                   <button type="submit" className="px-3 py-1.5 rounded-lg text-sm font-medium text-white" style={{ backgroundColor: colors.primary }}>
                     Add
                   </button>
-                  <button type="button" onClick={() => setAddDayOpen(false)} className="px-3 py-1.5 rounded-lg text-sm border" style={{ borderColor: colors.border, color: colors.text }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (clearNewDayError) clearNewDayError();
+                      setAddDayOpen(false);
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-sm border"
+                    style={{ borderColor: colors.border, color: colors.text }}
+                  >
                     Cancel
                   </button>
+                  {newDayError && (
+                    <p
+                      className="w-full text-xs mt-1 px-2 py-1 rounded-md"
+                      style={{
+                        color: colors.primary,
+                        backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                      }}
+                    >
+                      {newDayError}
+                    </p>
+                  )}
                 </form>
               )}
             </>

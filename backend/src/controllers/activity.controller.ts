@@ -230,12 +230,29 @@ export const deleteActivity = async (req: AuthRequest, res: Response) => {
     await Attachment.deleteMany({ activityId: id });
 
     const day = await Day.findById(activity.dayId);
-    
+    const tripId = day?.tripId?.toString();
+
     await activity.deleteOne();
 
-    if (day) {
-      await triggerWebhook(day.tripId.toString(), 'activity.deleted', {
+    if (day && tripId) {
+      await triggerWebhook(tripId, 'activity.deleted', {
         activityId: id,
+      });
+      const author = await User.findById(req.user?.userId).select('name').lean();
+      const authorName = (author as any)?.name ?? 'Someone';
+      emitFeedEvent(tripId, {
+        type: 'activity',
+        userName: authorName,
+        text: 'deleted an activity',
+        detail: activity.title,
+      });
+      emitTripNotification(tripId, {
+        type: 'activity_deleted',
+        title: 'Activity deleted',
+        body: activity.title,
+        actorId: req.user!.userId,
+        actorName: authorName,
+        metadata: { activityId: id, tripId },
       });
     }
 
