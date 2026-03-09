@@ -30,7 +30,10 @@ export function InviteMemberForm({ onInvite }: InviteMemberFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 mb-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-wrap items-end gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 mb-4"
+    >
       <div className="flex-1 min-w-[180px]">
         <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Email</label>
         <input
@@ -55,8 +58,8 @@ export function InviteMemberForm({ onInvite }: InviteMemberFormProps) {
       </div>
       <button
         type="submit"
-        disabled={loading}
-        className="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-dark disabled:opacity-50"
+        disabled={loading || !email.trim()}
+        className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Inviting…' : 'Invite'}
       </button>
