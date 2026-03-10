@@ -48,18 +48,30 @@ interface TripDetailSidebarProps {
   onSectionChange: (section: SectionId) => void;
   presenceSectionLabels?: Record<string, string>;
   tripId?: string;
+  variant?: 'desktop' | 'mobile';
 }
 
 const PRESENCE_COLORS = ['#8B5CF6', '#38BDF8', '#10B981', '#F59E0B'];
 
-export function TripDetailSidebar({ section, onSectionChange, presenceSectionLabels = {}, tripId }: TripDetailSidebarProps) {
+export function TripDetailSidebar({
+  section,
+  onSectionChange,
+  presenceSectionLabels = {},
+  tripId,
+  variant = 'desktop',
+}: TripDetailSidebarProps) {
   const colors = useLandingColors();
   const { presence } = useSocket();
   const { user } = useAuth();
   const otherUsers = presence.filter((p) => p.userId !== user?.id);
+  const isMobile = variant === 'mobile';
   return (
     <aside
-      className="w-52 shrink-0 flex flex-col border-r py-4"
+      className={
+        isMobile
+          ? 'w-64 shrink-0 flex flex-col border-r py-4'
+          : 'hidden md:flex w-52 shrink-0 flex-col border-r py-4'
+      }
       style={{ borderColor: colors.border, backgroundColor: colors.surface }}
     >
       <nav className="px-3 space-y-0.5">

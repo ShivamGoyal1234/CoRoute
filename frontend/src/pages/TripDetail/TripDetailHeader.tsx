@@ -22,6 +22,7 @@ interface TripDetailHeaderProps {
   trip: Trip;
   members: Membership[];
   section: SectionId;
+  onOpenSidebar?: () => void;
   onShareClick: () => void;
   onEditTripClick?: () => void;
   onNewExpenseClick?: () => void;
@@ -35,6 +36,7 @@ export function TripDetailHeader({
   trip,
   members,
   section,
+  onOpenSidebar,
   onShareClick,
   onEditTripClick,
   onNewExpenseClick,
@@ -81,15 +83,18 @@ export function TripDetailHeader({
     >
       <div className="flex items-center gap-3 min-w-0">
         <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+          <button
+            type="button"
+            className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 md:hidden"
             style={{ backgroundColor: colors.primary }}
+            onClick={onOpenSidebar}
+            aria-label="Open trip navigation"
           >
             <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-          </div>
-          <div className="min-w-0">
+          </button>
+          <div className="min-w-0 hidden md:block">
             <h1 className="font-bold text-base truncate" style={{ color: colors.text }}>
               {trip.title}
             </h1>
@@ -119,7 +124,7 @@ export function TripDetailHeader({
                 title={`${name} (${m.role})`}
               >
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-medium overflow-hidden border-2 shadow"
+                  className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-[10px] md:text-xs font-medium overflow-hidden border-2 shadow"
                   style={{ borderColor, backgroundColor: colors.surface }}
                 >
                   {u?.avatarUrl ? (
@@ -129,7 +134,7 @@ export function TripDetailHeader({
                   )}
                 </div>
                 <span
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 px-1.5 py-0.5 rounded-full text-[10px] font-semibold text-white whitespace-nowrap shadow-sm"
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 px-1 py-0.5 rounded-full text-[9px] md:text-[10px] font-semibold text-white whitespace-nowrap shadow-sm"
                   style={{ backgroundColor: pillBg }}
                 >
                   {pillLabel}
@@ -139,7 +144,7 @@ export function TripDetailHeader({
           })}
           {members.length > 3 && (
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
+              className="w-7 h-7 md:w-9 md:h-9 rounded-full flex items-center justify-center text-[10px] md:text-xs font-semibold shrink-0"
               style={{ marginLeft: -8, backgroundColor: colors.border, color: colors.text, zIndex: 0 }}
             >
               +{members.length - 3}
@@ -193,7 +198,7 @@ export function TripDetailHeader({
               <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
               <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
             </svg>
-            Share
+            <span className="hidden md:inline">Share</span>
           </button>
         )}
         {showEditTrip && (
@@ -211,7 +216,7 @@ export function TripDetailHeader({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Edit Trip
+            <span className="hidden md:inline">Edit Trip</span>
           </button>
         )}
 

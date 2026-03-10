@@ -3,12 +3,15 @@ import { getInitials } from '../../utils/helpers';
 import { useSocket, type FeedEvent, type TypingUser, type CollabTypingUser } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { tripsApi } from '../../lib/api';
+import arrowSvg from '../../assets/arrow.svg';
 import { useLandingColors } from '../../landing/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const COLLAB_TYPING_DEBOUNCE_MS = 400;
 const ACCEPT_IMAGE = 'image/jpeg,image/png,image/gif,image/webp';
 
 interface FeedItem {
+  type: string;
   name: string;
   text: string;
   detail?: string;
@@ -37,7 +40,10 @@ function formatFeedTime(timestamp: string) {
 
 export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveFeed }: CollaborationFeedProps) {
   const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
+  const collabTextColor = effectiveTheme === 'dark' ? colors.text : '#0F172A';
   const [minimized, setMinimized] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -59,7 +65,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
   );
 
   const handleMessageChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
       onTripNoteChange(e.target.value);
       if (!useLiveFeed) return;
       if (collabDebounceRef.current) clearTimeout(collabDebounceRef.current);
@@ -109,6 +115,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
 
   const items: FeedItem[] = useLiveFeed && feedEvents.length > 0
     ? feedEvents.map((evt: FeedEvent) => ({
+        type: evt.type,
         name: evt.userName,
         text: evt.text,
         detail: evt.detail,
@@ -124,32 +131,9 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
       avatarByUserName[item.name] = item.avatarUrl;
     }
   });
-  if (minimized) {
-    return (
-      <aside
-        className="w-12 shrink-0 flex flex-col items-center justify-center border-l py-3"
-        style={{ borderColor: colors.border, backgroundColor: colors.surface }}
-      >
-        <button
-          type="button"
-          onClick={() => setMinimized(false)}
-          className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
-          title="Expand chat"
-          aria-label="Expand collaboration feed"
-        >
-          <svg className="w-5 h-5" style={{ color: colors.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        </button>
-      </aside>
-    );
-  }
 
-  return (
-    <aside
-      className="w-72 shrink-0 flex flex-col border-l"
-      style={{ borderColor: colors.border, backgroundColor: colors.surface }}
-    >
+  const panelContent = (
+    <>
       <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: colors.border }}>
         <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.textMuted }}>
           Collaboration feed
@@ -158,7 +142,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
           <button
             type="button"
             onClick={() => setMinimized(true)}
-            className="p-1.5 rounded hover:bg-slate-100"
+            className="p-1.5 rounded hover:bg-slate-100 hidden md:inline-flex"
             aria-label="Minimize chat"
             title="Minimize"
           >
@@ -174,38 +158,117 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
         </div>
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4">
-        {items.length > 0 ? items.map((item: FeedItem, i: number) => (
-          <div key={`${item.name}-${item.time}-${i}`} className="flex gap-3">
-            {item.avatarUrl ? (
-              <div className="w-9 h-9 rounded-full shrink-0 overflow-hidden border" style={{ borderColor: colors.border }}>
-                <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
-              </div>
-            ) : (
+        {items.length > 0 ? items.map((item: FeedItem, i: number) => {
+          const isMessage = item.type === 'message';
+          const isMine = isMessage && user && item.name === user.name;
+          const messageBubbleBg = effectiveTheme === 'dark'
+            ? '#111827'
+            : '#F8FAFC';
+
+          if (isMessage) {
+            return (
               <div
-                className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium"
-                style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
+                key={`${item.name}-${item.time}-${i}`}
+                className={`flex items-start gap-2 ${isMine ? 'justify-end' : 'justify-start'}`}
               >
-                {getInitials(item.name)}
+                {!isMine && (
+                  item.avatarUrl ? (
+                    <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden border" style={{ borderColor: colors.border }}>
+                      <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-medium"
+                      style={{ backgroundColor: 'rgba(148, 163, 184, 0.35)', color: colors.primary }}
+                    >
+                      {getInitials(item.name)}
+                    </div>
+                  )
+                )}
+                <div className="max-w-[82%] flex flex-col items-end">
+                  <div
+                    className="rounded-2xl px-3 py-2 text-sm leading-snug break-words"
+                    style={{
+                      backgroundColor: messageBubbleBg,
+                      color: effectiveTheme === 'dark' ? '#FFFFFF' : '#0F172A',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                    }}
+                  >
+                    <span>{item.detail ?? (item.imageUrl ? 'Sent an image' : '')}</span>
+                    {item.imageUrl && (
+                      <a
+                        href={item.imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block mt-2 rounded-lg overflow-hidden border max-w-full"
+                        style={{ borderColor: colors.border }}
+                      >
+                        <img src={item.imageUrl} alt="Shared" className="max-h-40 w-auto object-cover" />
+                      </a>
+                    )}
+                  </div>
+                  {!item.typing && (
+                    <p className="text-[11px] mt-1" style={{ color: colors.textMuted }}>
+                      {item.time}
+                    </p>
+                  )}
+                </div>
+                {isMine && (
+                  item.avatarUrl ? (
+                    <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden border" style={{ borderColor: colors.border }}>
+                      <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-medium"
+                      style={{ backgroundColor: 'rgba(148, 163, 184, 0.35)', color: colors.primary }}
+                    >
+                      {getInitials(item.name)}
+                    </div>
+                  )
+                )}
               </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <p className="text-sm" style={{ color: colors.text }}>
-                <span className="font-medium">{item.name}</span> {item.text}
-              </p>
-              {item.detail && (
-                <p className="text-sm mt-0.5 font-medium" style={{ color: colors.primary }}>
-                  {item.detail}
+            );
+          }
+
+          return (
+            <div key={`${item.name}-${item.time}-${i}`} className="flex gap-3">
+              {item.avatarUrl ? (
+                <div className="w-9 h-9 rounded-full shrink-0 overflow-hidden border" style={{ borderColor: colors.border }}>
+                  <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div
+                  className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium"
+                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
+                >
+                  {getInitials(item.name)}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm" style={{ color: collabTextColor }}>
+                  <span className="font-medium">{item.name}</span>
+                  {item.text ? ` ${item.text}` : ''}
                 </p>
-              )}
-              {item.imageUrl && (
-                <a href={item.imageUrl} target="_blank" rel="noopener noreferrer" className="block mt-1.5 rounded-lg overflow-hidden border max-w-full" style={{ borderColor: colors.border }}>
-                  <img src={item.imageUrl} alt="Shared" className="max-h-40 w-auto object-cover" />
-                </a>
-              )}
-              {!item.typing && <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>{item.time}</p>}
+                {item.detail && (
+                  <p
+                    className="text-sm mt-0.5 font-medium"
+                    style={{ color: effectiveTheme === 'dark' ? colors.primary : collabTextColor }}
+                  >
+                    {item.detail}
+                  </p>
+                )}
+                {item.imageUrl && (
+                  <a href={item.imageUrl} target="_blank" rel="noopener noreferrer" className="block mt-1.5 rounded-lg overflow-hidden border max-w-full" style={{ borderColor: colors.border }}>
+                    <img src={item.imageUrl} alt="Shared" className="max-h-40 w-auto object-cover" />
+                  </a>
+                )}
+                {!item.typing && <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>{item.time}</p>}
+              </div>
             </div>
-          </div>
-        )) : (
+          );
+        }) : (
           <p className="text-sm py-4" style={{ color: colors.textMuted }}>
             Activity from your collaborators will appear here.
           </p>
@@ -230,7 +293,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: colors.text }}>
+                  <p className="text-sm" style={{ color: collabTextColor }}>
                     <span className="font-medium">{t.userName}</span> is typing…
                   </p>
                 </div>
@@ -251,7 +314,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: colors.text }}>
+                  <p className="text-sm" style={{ color: collabTextColor }}>
                     <span className="font-medium">{t.userName}</span> is typing a comment
                     {t.activityTitle ? ` in "${t.activityTitle.length > 25 ? t.activityTitle.slice(0, 25) + '…' : t.activityTitle}"` : '…'}
                   </p>
@@ -272,7 +335,13 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
             </button>
           </div>
         )}
-        <div className="flex gap-2">
+        <div
+          className="flex items-center gap-3 rounded-full px-4 py-2 shadow-sm"
+          style={{
+            backgroundColor: colors.surface,
+            boxShadow: '0 0 0 1px rgba(148, 163, 184, 0.25)',
+          }}
+        >
           <input
             ref={fileInputRef}
             type="file"
@@ -287,46 +356,133 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 rounded-full transition-colors hover:bg-slate-100 shrink-0 flex items-center justify-center"
-            style={{ color: colors.primary, width: '2rem', height: '2rem', padding: 0 }}
+            className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-slate-100 shrink-0"
+            style={{ color: colors.primary }}
             aria-label="Attach image"
             title="Attach image"
           >
             <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
               fill="none"
-              aria-hidden="true"
-              style={{ display: 'block' }}
+              stroke="currentColor"
+              strokeWidth={1.7}
             >
-              <circle cx="10" cy="10" r="9" stroke={colors.border} strokeWidth="1" fill={colors.background} />
-              <path d="M10 6v8M6 10h8" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M12 5v14M5 12h14"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
-          <input
+          <textarea
             value={tripNote}
-            onChange={handleMessageChange}
+            onChange={(e) => {
+              // auto-grow the textarea instead of showing a scrollbar
+              e.target.style.height = 'auto';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+              handleMessageChange(e);
+            }}
             onBlur={handleMessageBlur}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Send a message..."
-            className="flex-1 px-3 py-2 rounded-lg border text-sm placeholder-slate-400"
-            style={{ borderColor: colors.border }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            rows={1}
+            placeholder="Add a trip note..."
+            className="flex-1 bg-transparent text-sm placeholder-slate-400 focus:outline-none resize-none leading-snug"
+            style={{ color: collabTextColor, overflow: 'hidden' }}
           />
           <button
             type="button"
             onClick={handleSendMessage}
             disabled={(!tripNote.trim() && !selectedImage) || !tripId}
-            className="p-2 rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ color: colors.primary }}
+            className="flex h-8 w-8 items-center justify-center rounded-full disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ backgroundColor: 'transparent' }}
             aria-label="Send"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            <img src={arrowSvg} alt="Send" className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      {minimized ? (
+        <aside
+          className="hidden md:flex w-12 shrink-0 flex-col items-center justify-center border-l py-3"
+          style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+        >
+          <button
+            type="button"
+            onClick={() => setMinimized(false)}
+            className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            title="Expand chat"
+            aria-label="Expand collaboration feed"
+          >
+            <svg className="w-5 h-5" style={{ color: colors.primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </button>
+        </aside>
+      ) : (
+        <aside
+          className="hidden md:flex w-80 shrink-0 flex-col border-l"
+          style={{ borderColor: colors.border, backgroundColor: colors.surface }}
+        >
+          {panelContent}
+        </aside>
+      )}
+
+      {/* Mobile chatbot launcher */}
+      <button
+        type="button"
+        className="md:hidden fixed bottom-20 right-4 z-40 inline-flex items-center justify-center w-12 h-12 rounded-full shadow-lg"
+        style={{ backgroundColor: colors.primary, color: '#fff' }}
+        aria-label="Open collaboration chat"
+        onClick={() => setMobileOpen(true)}
+      >
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 10c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 18l1.395-3.72C3.512 13.042 3 11.574 3 10c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      </button>
+
+      {/* Mobile chatbot panel */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex items-end justify-center">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div
+            className="relative z-50 w-full max-w-md mx-auto mb-4 rounded-3xl shadow-xl overflow-hidden flex flex-col max-h-[80vh]"
+            style={{ backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }}
+          >
+            <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: colors.border }}>
+              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.textMuted }}>
+                Collaboration feed
+              </span>
+              <button
+                type="button"
+                className="p-1.5 rounded hover:bg-slate-100"
+                aria-label="Close chat"
+                onClick={() => setMobileOpen(false)}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {panelContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
