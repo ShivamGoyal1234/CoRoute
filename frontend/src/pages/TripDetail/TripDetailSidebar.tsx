@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { SIDEBAR_NAV } from './types';
 import { useSocket } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -46,11 +47,12 @@ interface TripDetailSidebarProps {
   section: SectionId;
   onSectionChange: (section: SectionId) => void;
   presenceSectionLabels?: Record<string, string>;
+  tripId?: string;
 }
 
 const PRESENCE_COLORS = ['#8B5CF6', '#38BDF8', '#10B981', '#F59E0B'];
 
-export function TripDetailSidebar({ section, onSectionChange, presenceSectionLabels = {} }: TripDetailSidebarProps) {
+export function TripDetailSidebar({ section, onSectionChange, presenceSectionLabels = {}, tripId }: TripDetailSidebarProps) {
   const colors = useLandingColors();
   const { presence } = useSocket();
   const { user } = useAuth();
@@ -79,6 +81,21 @@ export function TripDetailSidebar({ section, onSectionChange, presenceSectionLab
           </button>
         ))}
       </nav>
+      {tripId && (
+        <div className="mt-4 px-3">
+          <Link
+            to={`/settings?tripId=${tripId}`}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:opacity-90"
+            style={{ color: colors.textMuted }}
+          >
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Trip Settings
+          </Link>
+        </div>
+      )}
       <div className="mt-auto px-3 pt-4 border-t" style={{ borderColor: colors.border }}>
         <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.textMuted }}>
           Live presence

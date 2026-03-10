@@ -35,6 +35,28 @@ export const authApi = {
   resetPassword: (email: string, otp: string, newPassword: string) =>
     api.post<{ message: string }>('/auth/reset-password', { email, otp, newPassword }),
   me: () => api.get<{ user: User }>('/auth/me'),
+  updateProfile: (data: {
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+    bio?: string;
+    action?: 'deactivate' | 'delete' | 'reactivate' | 'reactivate';
+    avatarFile?: File;
+  }) => {
+    if (data.avatarFile) {
+      const form = new FormData();
+      if (data.name) form.append('name', data.name);
+      if (data.email) form.append('email', data.email);
+      if (data.bio) form.append('bio', data.bio);
+      if (data.action) form.append('action', data.action);
+      form.append('avatar', data.avatarFile);
+      return api.put<{ message: string; user: User }>('/auth/profile', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    const { avatarFile, ...rest } = data;
+    return api.put<{ message: string; user: User }>('/auth/profile', rest);
+  },
 };
 
 export const tripsApi = {

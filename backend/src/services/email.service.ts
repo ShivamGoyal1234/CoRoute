@@ -74,3 +74,40 @@ export async function sendOtpEmail(to: string, otp: string, purpose: 'register' 
   );
   await Promise.race([sendPromise, timeoutPromise]);
 }
+
+export async function sendTripInviteEmail(to: string, inviterName: string, tripTitle: string): Promise<void> {
+  const subject = `${inviterName} invited you to collaborate on "${tripTitle}"`;
+  const text = `${inviterName} has invited you to the trip "${tripTitle}" on CoRoute. Sign in to view the trip and start collaborating.`;
+  const html = `<p>${inviterName} has invited you to the trip <strong>${tripTitle}</strong> on CoRoute.</p>
+<p>Sign in to view the trip and start collaborating.</p>`;
+
+  const resend = getResend();
+  if (resend) {
+    const { error } = await resend.emails.send({
+      from: config.resend.from,
+      to: [to],
+      subject,
+      text,
+      html,
+    });
+    if (error) throw new Error(`Resend: ${error.message}`);
+    return;
+  }
+
+  const trans = getTransporter();
+  if (!trans) {
+    if (config.nodeEnv === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`[DEV] Trip invite email to ${to}: ${subject}`);
+    }
+    return;
+  }
+
+  await trans.sendMail({
+    from: config.smtp.from,
+    to,
+    subject,
+    text,
+    html,
+  });
+}

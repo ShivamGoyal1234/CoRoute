@@ -14,7 +14,8 @@ function isTripDetailPath(pathname: string): boolean {
 }
 
 const navItems = [
-  { to: '/dashboard', label: 'My Trips', icon: 'trips' },
+  { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+  { to: '/profile', label: 'Profile', icon: 'user' },
   { to: '/shared', label: 'Shared with Me', icon: 'shared' },
   { to: '/archived', label: 'Archived', icon: 'archive' },
 ];
@@ -44,6 +45,13 @@ function NavIcon({ name }: { name: string }) {
       return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+        </svg>
+      );
+    case 'user':
+      return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 12a4 4 0 100-8 4 4 0 000 8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 20a6 6 0 1112 0H6z" />
         </svg>
       );
     default:

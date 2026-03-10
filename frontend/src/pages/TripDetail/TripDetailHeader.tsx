@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import type { Trip, Membership } from '../../types';
 import { formatDateRangeShort, getInitials } from '../../utils/helpers';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { useLandingColors } from '../../landing/theme';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import type { SectionId } from './types';
 
 function formatNotificationTime(timestamp: string) {
@@ -43,6 +44,8 @@ export function TripDetailHeader({
   onLogout,
 }: TripDetailHeaderProps) {
   const colors = useLandingColors();
+  const { effectiveTheme } = useTheme();
+  const isDark = effectiveTheme === 'dark';
   const showNewExpense = section === 'budgeting' && onNewExpenseClick;
   const showEditTrip = section === 'itinerary' && canEdit && onEditTripClick;
   const { user: currentUser } = useAuth();
@@ -53,6 +56,7 @@ export function TripDetailHeader({
   } = useSocket();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!notificationOpen) return;
@@ -158,36 +162,59 @@ export function TripDetailHeader({
             + New Expense
           </button>
         )}
+        {!showNewExpense && (
+          <button
+            type="button"
+            onClick={onShareClick}
+            className="px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-opacity hover:opacity-95"
+            style={{
+              backgroundColor: isDark ? colors.primary : 'transparent',
+              color: isDark ? '#fff' : colors.primary,
+              border: isDark ? 'none' : `1.5px solid ${colors.border}`,
+              borderRadius: '10px',
+              boxShadow: isDark ? '0 4px 14px 0 rgba(139, 92, 246, 0.35)' : 'none',
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-share2-icon lucide-share-2"
+            >
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+              <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+            </svg>
+            Share
+          </button>
+        )}
         {showEditTrip && (
           <button
             type="button"
             onClick={onEditTripClick}
             className="px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-95 flex items-center gap-2 border"
             style={{
-              color: colors.primary,
-              borderColor: colors.primary,
-              backgroundColor: 'transparent',
+              backgroundColor: isDark ? colors.primary : 'transparent',
+              color: isDark ? '#fff' : colors.primary,
+              borderColor: isDark ? 'transparent' : colors.border,
+              boxShadow: isDark ? '0 4px 14px 0 rgba(139, 92, 246, 0.35)' : 'none',
             }}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Edit trip
+            Edit Trip
           </button>
         )}
-        {!showNewExpense && (
-          <button
-            type="button"
-            onClick={onShareClick}
-            className="px-4 py-2 rounded-xl font-medium text-white transition-opacity hover:opacity-95"
-            style={{
-              backgroundColor: colors.primary,
-              boxShadow: '0 4px 14px 0 rgba(139, 92, 246, 0.35)',
-            }}
-          >
-            Share Trip
-          </button>
-        )}
+
         <div className="relative shrink-0" ref={notificationRef}>
           <button
             type="button"
@@ -244,9 +271,9 @@ export function TripDetailHeader({
                       <li
                         key={n.id}
                         className="flex gap-3 px-4 py-3 transition-colors"
-                    style={{ backgroundColor: 'transparent' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                        style={{ backgroundColor: 'transparent' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                       >
                         <div
                           className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold"
@@ -275,18 +302,6 @@ export function TripDetailHeader({
             </div>
           )}
         </div>
-        <Link
-          to={`/settings?tripId=${trip._id}`}
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none"
-          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
-          title="Settings"
-          aria-label="Settings"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </Link>
         {currentUser && (
           <div
             className="relative flex items-center gap-2 pl-2 border-l"
@@ -307,9 +322,21 @@ export function TripDetailHeader({
             </button>
             {showLogout && (
               <div
-                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[120px] py-2"
+                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[160px] py-2"
                 style={{ borderColor: colors.border, backgroundColor: colors.surface }}
               >
+                <button
+                  className="w-full text-left px-4 py-2 text-sm transition-colors"
+                  style={{ color: colors.text }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  onClick={() => {
+                    onLogoutToggle();
+                    navigate('/profile');
+                  }}
+                >
+                  Profile
+                </button>
                 <button
                   className="w-full text-left px-4 py-2 text-sm transition-colors"
                   style={{ color: colors.text }}

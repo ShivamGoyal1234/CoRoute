@@ -5,6 +5,10 @@ export interface IUser {
   password: string;
   name: string;
   avatarUrl?: string;
+  bio?: string;
+  status?: 'active' | 'deactivated' | 'deleted';
+  deactivatedAt?: Date | null;
+  deletedAt?: Date | null;
   createdAt: Date;
 }
 

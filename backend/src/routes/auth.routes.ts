@@ -27,6 +27,11 @@ router.post('/forgot-password', validateForgotPassword, forgotPassword);
 router.post('/reset-password', validateResetPassword, resetPassword);
 
 router.get('/me', authenticate, getMe);
-router.put('/profile', authenticate, updateProfile);
+router.put(
+  '/profile',
+  authenticate,
+  uploadAvatar.single('avatar') as unknown as RequestHandler,
+  updateProfile
+);
 
 export default router;

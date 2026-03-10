@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { getInitials } from '../../utils/helpers';
@@ -36,7 +36,6 @@ interface OrganizationTopNavHeaderProps {
 }
 
 export function OrganizationTopNavHeader({
-  tripId,
   tripTitle,
   section,
   onSectionChange,
@@ -54,6 +53,7 @@ export function OrganizationTopNavHeader({
   } = useSocket();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!notificationOpen) return;
@@ -209,21 +209,9 @@ export function OrganizationTopNavHeader({
             </div>
           )}
         </div>
-        <Link
-          to={`/settings?tripId=${tripId}`}
-          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-opacity hover:opacity-90 focus:outline-none"
-          style={{ backgroundColor: 'rgba(139, 92, 246, 0.15)', color: colors.primary }}
-          title="Settings"
-          aria-label="Settings"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </Link>
         {currentUser && (
           <div
-className="relative flex items-center gap-2 pl-2 border-l"
+            className="relative flex items-center gap-2 pl-2 border-l"
             style={{ borderColor: colors.border }}
           >
             <button
@@ -241,9 +229,21 @@ className="relative flex items-center gap-2 pl-2 border-l"
             </button>
             {showLogout && (
               <div
-                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[120px] py-2"
+                className="absolute right-0 top-[110%] z-50 border rounded-lg shadow-lg min-w-[160px] py-2"
                 style={{ borderColor: colors.border, backgroundColor: colors.surface }}
               >
+                <button
+                  className="w-full text-left px-4 py-2 text-sm transition-colors"
+                  style={{ color: colors.text }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = colors.background; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  onClick={() => {
+                    onLogoutToggle();
+                    navigate('/profile');
+                  }}
+                >
+                  Profile
+                </button>
                 <button
                   className="w-full text-left px-4 py-2 text-sm transition-colors"
                   style={{ color: colors.text }}

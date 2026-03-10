@@ -137,6 +137,14 @@ export const login = async (req: AuthRequest, res: Response) => {
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    if (user.status === 'deleted') {
+      return res.status(403).json({ error: 'This account has been deleted.' });
+    }
+
+    if (user.status === 'deactivated') {
+      return res.status(403).json({ error: 'This account has been deactivated.' });
+    }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -180,14 +188,70 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, avatarUrl } = req.body;
+    const { name, avatarUrl: avatarUrlBody, bio, email, action } = req.body as {
+      name?: string;
+      avatarUrl?: string;
+      bio?: string;
+      email?: string;
+      action?: 'deactivate' | 'delete' | 'reactivate';
+    };
     const userId = req.user?.userId;
 
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { name, avatarUrl },
-      { new: true, runValidators: true }
-    ).select('-password');
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const update: Record<string, unknown> = {};
+
+    let avatarUrl = avatarUrlBody;
+    if (req.file) {
+      try {
+        avatarUrl = await getFileUrlAfterUpload(req.file);
+      } catch (err) {
+        console.error('Avatar upload failed:', err);
+        return res.status(400).json({ error: 'Failed to upload avatar' });
+      }
+    }
+
+    if (typeof name === 'string' && name.trim()) {
+      update.name = name.trim();
+    }
+
+    if (typeof avatarUrl === 'string') {
+      update.avatarUrl = avatarUrl;
+    }
+
+    if (typeof bio === 'string') {
+      update.bio = bio;
+    }
+
+    if (typeof email === 'string' && email.trim()) {
+      const existingWithEmail = await User.findOne({ email: email.trim(), _id: { $ne: userId } });
+      if (existingWithEmail) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+      update.email = email.trim().toLowerCase();
+    }
+
+    if (action === 'deactivate') {
+      update.status = 'deactivated';
+      update.deactivatedAt = new Date();
+    }
+
+    if (action === 'delete') {
+      update.status = 'deleted';
+      update.deletedAt = new Date();
+    }
+
+    if (action === 'reactivate') {
+      update.status = 'active';
+      update.deactivatedAt = null;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, update, {
+      new: true,
+      runValidators: true,
+    }).select('-password');
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
