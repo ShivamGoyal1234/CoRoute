@@ -23,7 +23,12 @@ router.post('/', validateTrip, createTrip);
 router.get('/', getTrips);
 router.get('/:id', canView, getTripById);
 router.get('/:id/feed', canView, getTripFeed);
-router.post('/:id/messages', canView, uploadMessageImage as RequestHandler, sendTripMessage);
+router.post(
+  '/:id/messages',
+  canView,
+  uploadMessageImage as unknown as RequestHandler,
+  sendTripMessage
+);
 router.put('/:id', canEdit, validateTrip, updateTrip);
 router.delete('/:id', isOwner, deleteTrip);
 router.get('/:id/stats', canView, getTripStats);
