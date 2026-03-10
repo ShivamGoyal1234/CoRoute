@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 import { Response } from 'express';
+import multer from 'multer';
+import path from 'path';
 import { validationResult } from 'express-validator';
 import Trip from '../models/Trip';
 import Membership from '../models/Membership';
@@ -8,7 +10,20 @@ import User from '../models/User';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { MemberRole } from '../types';
 import { triggerWebhook } from '../services/webhook.service';
+import { getFileUrlAfterUpload } from '../storage';
 import { emitFeedEvent, getFeedEvents, emitTripNotification } from '../socket/socket.service';
+
+const imageFilter = (_req: unknown, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  const allowed = /\.(jpe?g|png|gif|webp)$/i.test(path.extname(file.originalname))
+    || /^image\/(jpeg|jpg|png|gif|webp)$/.test(file.mimetype);
+  cb(null, !!allowed);
+};
+
+export const uploadMessageImage = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: imageFilter,
+}).single('image');
 
 export const createTrip = async (req: AuthRequest, res: Response) => {
   try {
@@ -175,21 +190,30 @@ export const sendTripMessage = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const content = typeof req.body?.content === 'string' ? req.body.content.trim() : '';
-    if (!content) return res.status(400).json({ error: 'Message content required' });
+    const hasImage = !!(req as any).file;
+    if (!content && !hasImage) return res.status(400).json({ error: 'Message content or image required' });
     const trip = await Trip.findById(id);
     if (!trip) return res.status(404).json({ error: 'Trip not found' });
-    const author = await User.findById(req.user?.userId).select('name').lean();
+    let imageUrl: string | undefined;
+    if (hasImage && (req as any).file) {
+      imageUrl = await getFileUrlAfterUpload((req as any).file);
+    }
+    const author = await User.findById(req.user?.userId).select('name avatarUrl').lean();
     const userName = (author as any)?.name ?? 'Someone';
+    const userAvatarUrl = (author as any)?.avatarUrl as string | undefined;
+    const detail = content ? (content.length > 200 ? content.slice(0, 200) + '…' : content) : (imageUrl ? 'sent an image' : undefined);
     emitFeedEvent(id, {
       type: 'message',
       userName,
       text: 'sent a message',
-      detail: content.length > 200 ? content.slice(0, 200) + '…' : content,
+      detail: detail ?? undefined,
+      imageUrl,
+      userAvatarUrl,
     });
     emitTripNotification(id, {
       type: 'message',
       title: 'New message',
-      body: content.length > 120 ? content.slice(0, 120) + '…' : content,
+      body: detail ?? 'Sent an image',
       actorId: req.user!.userId,
       actorName: userName,
       metadata: { tripId: id },
@@ -248,8 +272,9 @@ export const updateTrip = async (req: AuthRequest, res: Response) => {
 
     const budgetChanged = totalBudget !== undefined || (rawCategories && Array.isArray(rawCategories));
     if (budgetChanged) {
-      const author = await User.findById(req.user?.userId).select('name').lean();
+      const author = await User.findById(req.user?.userId).select('name avatarUrl').lean();
       const authorName = (author as any)?.name ?? 'Someone';
+      const userAvatarUrl = (author as any)?.avatarUrl as string | undefined;
       const detail = totalBudget !== undefined
         ? `Budget set to ${trip.baseCurrency} ${Number(totalBudget).toLocaleString()}`
         : 'Budget categories updated';
@@ -258,6 +283,7 @@ export const updateTrip = async (req: AuthRequest, res: Response) => {
         userName: authorName,
         text: 'updated the budget',
         detail,
+        userAvatarUrl,
       });
       emitTripNotification(id, {
         type: 'budget',

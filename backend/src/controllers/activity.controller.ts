@@ -51,13 +51,15 @@ export const createActivity = async (req: AuthRequest, res: Response) => {
       title: activity.title,
       dayId,
     });
-    const author = await User.findById(req.user?.userId).select('name').lean();
+    const author = await User.findById(req.user?.userId).select('name avatarUrl').lean();
     const authorName = (author as any)?.name ?? 'Someone';
+    const userAvatarUrl = (author as any)?.avatarUrl as string | undefined;
     emitFeedEvent(tripId, {
       type: 'activity',
       userName: authorName,
       text: 'added an activity',
       detail: title,
+      userAvatarUrl,
     });
     emitTripNotification(tripId, {
       type: 'activity_added',
@@ -166,8 +168,9 @@ export const updateActivity = async (req: AuthRequest, res: Response) => {
       });
     }
     if (tripId && Object.keys(updateFields).length > 0) {
-      const author = await User.findById(req.user?.userId).select('name').lean();
+      const author = await User.findById(req.user?.userId).select('name avatarUrl').lean();
       const authorName = (author as any)?.name ?? 'Someone';
+      const userAvatarUrl = (author as any)?.avatarUrl as string | undefined;
       const parts: string[] = [];
       if (title !== undefined) parts.push(`"${String(title).slice(0, 30)}${String(title).length > 30 ? '…' : ''}"`);
       if (cost !== undefined) parts.push(`cost $${Number(cost)}`);
@@ -178,6 +181,7 @@ export const updateActivity = async (req: AuthRequest, res: Response) => {
         userName: authorName,
         text: 'updated an activity',
         detail,
+        userAvatarUrl,
       });
       emitTripNotification(tripId, {
         type: 'activity_updated',
@@ -238,13 +242,15 @@ export const deleteActivity = async (req: AuthRequest, res: Response) => {
       await triggerWebhook(tripId, 'activity.deleted', {
         activityId: id,
       });
-      const author = await User.findById(req.user?.userId).select('name').lean();
+      const author = await User.findById(req.user?.userId).select('name avatarUrl').lean();
       const authorName = (author as any)?.name ?? 'Someone';
+      const userAvatarUrl = (author as any)?.avatarUrl as string | undefined;
       emitFeedEvent(tripId, {
         type: 'activity',
         userName: authorName,
         text: 'deleted an activity',
         detail: activity.title,
+        userAvatarUrl,
       });
       emitTripNotification(tripId, {
         type: 'activity_deleted',

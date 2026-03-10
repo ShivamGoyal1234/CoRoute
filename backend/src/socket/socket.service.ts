@@ -7,7 +7,18 @@ import Membership from '../models/Membership';
 let io: SocketServer | null = null;
 
 const FEED_STORE_MAX = 100;
-const feedStore = new Map<string, Array<{ type: string; userName: string; text: string; detail?: string; timestamp: string }>>();
+const feedStore = new Map<
+  string,
+  Array<{
+    type: string;
+    userName: string;
+    text: string;
+    detail?: string;
+    imageUrl?: string;
+    userAvatarUrl?: string;
+    timestamp: string;
+  }>
+>();
 
 export function initSocket(httpServer: import('http').Server): SocketServer {
   const corsOrigin = config.nodeEnv === 'development'
@@ -192,7 +203,14 @@ export function emitCommentNew(tripId: string, comment: object) {
   io?.to(`trip:${tripId}`).emit('comment:new', comment);
 }
 
-export function emitFeedEvent(tripId: string, event: { type: string; userName: string; text: string; detail?: string }) {
+export function emitFeedEvent(tripId: string, event: {
+  type: string;
+  userName: string;
+  text: string;
+  detail?: string;
+  imageUrl?: string;
+  userAvatarUrl?: string;
+}) {
   const full = { ...event, timestamp: new Date().toISOString() };
   io?.to(`trip:${tripId}`).emit('feed:event', full);
   if (!feedStore.has(tripId)) feedStore.set(tripId, []);
@@ -201,8 +219,17 @@ export function emitFeedEvent(tripId: string, event: { type: string; userName: s
   if (list.length > FEED_STORE_MAX) list.length = FEED_STORE_MAX;
 }
 
-export function getFeedEvents(tripId: string): Array<{ type: string; userName: string; text: string; detail?: string; timestamp: string }> {
-  return feedStore.get(tripId) ?? [];
+export function getFeedEvents(tripId: string): Array<{
+  type: string;
+  userName: string;
+  text: string;
+  detail?: string;
+  imageUrl?: string;
+  userAvatarUrl?: string;
+  timestamp: string;
+}> {
+  const list = feedStore.get(tripId) ?? [];
+  return [...list].reverse();
 }
 
 export function emitAttachmentNew(tripId: string, payload: { activityId: string; attachment: object }) {

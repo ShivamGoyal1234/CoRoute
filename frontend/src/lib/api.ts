@@ -56,9 +56,18 @@ export const tripsApi = {
   delete: (id: string) => api.delete(`/trips/${id}`),
   stats: (id: string) => api.get<{ stats: TripStats }>(`/trips/${id}/stats`),
   getFeed: (id: string) =>
-    api.get<{ feed: Array<{ type: string; userName: string; text: string; detail?: string; timestamp: string }> }>(`/trips/${id}/feed`),
-  sendMessage: (id: string, content: string) =>
-    api.post<{ message: string }>(`/trips/${id}/messages`, { content }),
+    api.get<{ feed: Array<{ type: string; userName: string; text: string; detail?: string; imageUrl?: string; timestamp: string }> }>(`/trips/${id}/feed`),
+  sendMessage: (id: string, content: string, image?: File) => {
+    if (image) {
+      const form = new FormData();
+      form.append('content', content);
+      form.append('image', image);
+      return api.post<{ message: string }>(`/trips/${id}/messages`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    return api.post<{ message: string }>(`/trips/${id}/messages`, { content });
+  },
 };
 
 export const membersApi = {

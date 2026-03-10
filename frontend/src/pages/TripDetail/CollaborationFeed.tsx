@@ -1,4 +1,4 @@
-import { useRef, useCallback, useState } from 'react';
+import { useRef, useCallback, useState, useEffect } from 'react';
 import { getInitials } from '../../utils/helpers';
 import { useSocket, type FeedEvent, type TypingUser, type CollabTypingUser } from '../../contexts/SocketContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,11 +6,14 @@ import { tripsApi } from '../../lib/api';
 import { useLandingColors } from '../../landing/theme';
 
 const COLLAB_TYPING_DEBOUNCE_MS = 400;
+const ACCEPT_IMAGE = 'image/jpeg,image/png,image/gif,image/webp';
 
 interface FeedItem {
   name: string;
   text: string;
   detail?: string;
+  imageUrl?: string;
+  avatarUrl?: string;
   time: string;
   typing: boolean;
 }
@@ -35,6 +38,9 @@ function formatFeedTime(timestamp: string) {
 export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveFeed }: CollaborationFeedProps) {
   const colors = useLandingColors();
   const [minimized, setMinimized] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { user } = useAuth();
   const {
     feedEvents,
@@ -75,20 +81,39 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
 
   const handleSendMessage = useCallback(async () => {
     const content = tripNote.trim();
-    if (!tripId || !content) return;
+    if (!tripId || (!content && !selectedImage)) return;
     handleMessageBlur();
     try {
-      await tripsApi.sendMessage(tripId, content);
+      await tripsApi.sendMessage(tripId, content, selectedImage ?? undefined);
       onTripNoteChange('');
+      setSelectedImage(null);
     } catch {
       // ignore
     }
-  }, [tripId, tripNote, onTripNoteChange, handleMessageBlur]);
+  }, [tripId, tripNote, selectedImage, onTripNoteChange, handleMessageBlur]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [feedEvents]);
+
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!selectedImage) {
+      setImagePreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(selectedImage);
+    setImagePreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedImage]);
+
   const items: FeedItem[] = useLiveFeed && feedEvents.length > 0
     ? feedEvents.map((evt: FeedEvent) => ({
         name: evt.userName,
         text: evt.text,
         detail: evt.detail,
+        imageUrl: evt.imageUrl,
+        avatarUrl: evt.userAvatarUrl,
         time: formatFeedTime(evt.timestamp),
         typing: false,
       }))
@@ -158,7 +183,7 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm" style={{ color: colors.text }}>
-                    <span className="font-medium">{t.userName}</span> is typing a message…
+                    <span className="font-medium">{t.userName}</span> is typing…
                   </p>
                 </div>
               </div>
@@ -183,12 +208,18 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
         )}
         {items.length > 0 ? items.map((item: FeedItem, i: number) => (
           <div key={`${item.name}-${item.time}-${i}`} className="flex gap-3">
-            <div
-              className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium"
-              style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
-            >
-              {getInitials(item.name)}
-            </div>
+            {item.avatarUrl ? (
+              <div className="w-9 h-9 rounded-full shrink-0 overflow-hidden border" style={{ borderColor: colors.border }}>
+                <img src={item.avatarUrl} alt={item.name} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div
+                className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium"
+                style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
+              >
+                {getInitials(item.name)}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="text-sm" style={{ color: colors.text }}>
                 <span className="font-medium">{item.name}</span> {item.text}
@@ -198,6 +229,11 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
                   {item.detail}
                 </p>
               )}
+              {item.imageUrl && (
+                <a href={item.imageUrl} target="_blank" rel="noopener noreferrer" className="block mt-1.5 rounded-lg overflow-hidden border max-w-full" style={{ borderColor: colors.border }}>
+                  <img src={item.imageUrl} alt="Shared" className="max-h-40 w-auto object-cover" />
+                </a>
+              )}
               {!item.typing && <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>{item.time}</p>}
             </div>
           </div>
@@ -206,22 +242,63 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
             Activity from your collaborators will appear here.
           </p>
         )}
+        <div ref={messagesEndRef} />
       </div>
       <div className="shrink-0 p-4 border-t" style={{ borderColor: colors.border }}>
+        {selectedImage && imagePreviewUrl && (
+          <div className="flex items-center gap-2 mb-2">
+            <img src={imagePreviewUrl} alt="Preview" className="h-12 w-12 rounded object-cover border" style={{ borderColor: colors.border }} />
+            <span className="text-sm truncate flex-1" style={{ color: colors.textMuted }}>{selectedImage.name}</span>
+            <button type="button" onClick={() => setSelectedImage(null)} className="p-1 rounded hover:bg-slate-200 text-slate-500" aria-label="Remove image">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        )}
         <div className="flex gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPT_IMAGE}
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) setSelectedImage(f);
+              e.target.value = '';
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2 rounded-full transition-colors hover:bg-slate-100 shrink-0 flex items-center justify-center"
+            style={{ color: colors.primary, width: '2rem', height: '2rem', padding: 0 }}
+            aria-label="Attach image"
+            title="Attach image"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+              style={{ display: 'block' }}
+            >
+              <circle cx="10" cy="10" r="9" stroke={colors.border} strokeWidth="1" fill={colors.background} />
+              <path d="M10 6v8M6 10h8" stroke={colors.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
           <input
             value={tripNote}
             onChange={handleMessageChange}
             onBlur={handleMessageBlur}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Send a message to the team..."
+            placeholder="Send a message..."
             className="flex-1 px-3 py-2 rounded-lg border text-sm placeholder-slate-400"
             style={{ borderColor: colors.border }}
           />
           <button
             type="button"
             onClick={handleSendMessage}
-            disabled={!tripNote.trim() || !tripId}
+            disabled={(!tripNote.trim() && !selectedImage) || !tripId}
             className="p-2 rounded-lg transition-colors hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ color: colors.primary }}
             aria-label="Send"
