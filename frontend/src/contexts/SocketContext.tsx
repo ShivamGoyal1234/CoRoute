@@ -23,6 +23,8 @@ export interface FeedEvent {
   userName: string;
   text: string;
   detail?: string;
+  imageUrl?: string;
+  userAvatarUrl?: string;
   timestamp: string;
 }
 
@@ -164,8 +166,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       setPresence(payload.users ?? []);
     });
 
+    //bottom - top order
     socket.on('feed:event', (evt: FeedEvent) => {
-      setFeedEvents((prev) => [evt, ...prev].slice(0, FEED_MAX_EVENTS));
+      setFeedEvents((prev) => [...prev, evt].slice(-FEED_MAX_EVENTS));
     });
 
     socket.on('typing:user', (payload: TypingUser) => {

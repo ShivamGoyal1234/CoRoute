@@ -44,6 +44,7 @@ export const createComment = async (req: AuthRequest, res: Response) => {
     }
     if (tripId) {
       const author = (comment.userId as any)?.name ?? 'Someone';
+      const avatarUrl = (comment.userId as any)?.avatarUrl as string | undefined;
       const userIdObj = comment.userId as any;
       emitCommentNew(tripId, {
         _id: comment._id.toString(),
@@ -65,6 +66,7 @@ export const createComment = async (req: AuthRequest, res: Response) => {
         userName: author,
         text: 'added a comment',
         detail: content.length > 60 ? content.slice(0, 60) + '…' : content,
+        userAvatarUrl: avatarUrl,
       });
       emitTripNotification(tripId, {
         type: 'comment',

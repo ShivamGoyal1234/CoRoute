@@ -63,12 +63,14 @@ export const uploadAttachment = async (req: AuthRequest, res: Response) => {
     const day = await Day.findById(activity.dayId);
     const tripId = day?.tripId?.toString();
     if (tripId) {
-      const userName = (attachment.userId as { name?: string })?.name ?? 'Someone';
+      const userName = (attachment.userId as { name?: string; avatarUrl?: string })?.name ?? 'Someone';
+      const userAvatarUrl = (attachment.userId as { avatarUrl?: string } | null)?.avatarUrl as string | undefined;
       emitFeedEvent(tripId, {
         type: 'attachment_added',
         userName,
         text: 'added a file',
         detail: activity.title,
+        userAvatarUrl,
       });
       emitAttachmentNew(tripId, {
         activityId: activityId.toString(),
@@ -133,14 +135,16 @@ export const deleteAttachment = async (req: AuthRequest, res: Response) => {
     await attachment.deleteOne();
 
     if (tripId) {
-      const author = await User.findById(userId).select('name').lean();
+      const author = await User.findById(userId).select('name avatarUrl').lean();
       const userName = (author as { name?: string } | null)?.name ?? 'Someone';
+      const userAvatarUrl = (author as { avatarUrl?: string } | null)?.avatarUrl as string | undefined;
       const detail = activity ? activity.title : (fileName ? `"${fileName}"` : 'a file');
       emitFeedEvent(tripId, {
         type: 'attachment_removed',
         userName,
         text: 'removed a file',
         detail: activity ? activity.title : (fileName ? `"${fileName}"` : undefined),
+        userAvatarUrl,
       });
       emitAttachmentRemoved(tripId, { activityId, attachmentId });
       emitTripNotification(tripId, {
