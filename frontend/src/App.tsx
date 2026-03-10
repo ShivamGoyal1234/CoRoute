@@ -10,6 +10,7 @@ import TripDetail from './pages/TripDetail/index';
 import SharedPage from './pages/SharedPage.tsx';
 import ArchivedPage from './pages/ArchivedPage.tsx';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route element={<Layout />}>
           <Route path="dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="shared" element={<ProtectedRoute><SharedPage /></ProtectedRoute>} />
           <Route path="archived" element={<ProtectedRoute><ArchivedPage /></ProtectedRoute>} />
           <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

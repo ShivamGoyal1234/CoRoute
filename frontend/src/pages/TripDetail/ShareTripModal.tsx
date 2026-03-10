@@ -73,33 +73,34 @@ export function ShareTripModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div
-        className="rounded-xl border w-full max-w-md max-h-[90vh] overflow-hidden shadow-xl flex flex-col"
+        className="w-full max-w-lg md:max-w-xl max-h-[90vh] overflow-hidden rounded-2xl shadow-[0_18px_45px_rgba(15,23,42,0.18)] border flex flex-col bg-white"
         style={{ borderColor: colors.border, backgroundColor: colors.surface }}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: colors.border }}>
-          <h2 className="font-semibold text-lg" style={{ color: colors.text }}>Share trip</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: colors.border }}>
+          <div>
+            <h2 className="font-semibold text-lg" style={{ color: colors.text }}>
+              Share trip
+            </h2>
+            <p className="text-xs mt-0.5" style={{ color: colors.textMuted }}>
+              Invite collaborators and manage who can edit this trip.
+            </p>
+          </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg"
+            className="p-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer disabled:cursor-not-allowed"
             style={{ color: colors.textMuted }}
             aria-label="Close"
             disabled={isSubmitting}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.background;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-4 space-y-4">
           {isOwner && <InviteMemberForm onInvite={onInvite} />}
           <ul className="divide-y" style={{ borderColor: colors.border }}>
             {localMembers.map((m) => {
@@ -108,7 +109,7 @@ export function ShareTripModal({
               const email = u?.email ?? '';
               const isOwnerMember = m.role === 'owner';
               return (
-                <li key={m._id} className="flex items-center justify-between py-3">
+                <li key={m._id} className="flex items-center justify-between py-3.5">
                   <div className="flex items-center gap-3">
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center font-medium text-sm"
@@ -121,10 +122,10 @@ export function ShareTripModal({
                       )}
                     </div>
                     <div>
-                      <p className="font-medium" style={{ color: colors.text }}>
+                      <p className="font-medium text-sm" style={{ color: colors.text }}>
                         {name}
                       </p>
-                      <p className="text-sm" style={{ color: colors.textMuted }}>
+                      <p className="text-xs" style={{ color: colors.textMuted }}>
                         {email}
                       </p>
                     </div>
@@ -135,7 +136,7 @@ export function ShareTripModal({
                         <select
                           value={m.pendingRole}
                           onChange={(e) => handleChangeRole(m._id, e.target.value as MemberRole)}
-                          className="text-sm rounded border px-2 py-1"
+                          className="text-xs rounded-lg border px-3 py-1.5 bg-white cursor-pointer disabled:cursor-not-allowed"
                           style={{ borderColor: colors.border }}
                           disabled={isSubmitting}
                         >
@@ -145,7 +146,18 @@ export function ShareTripModal({
                         <button
                           type="button"
                           onClick={() => handleRemoveLocal(m._id)}
-                          className="text-sm text-red-600 hover:underline"
+                          className="text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-colors cursor-pointer disabled:cursor-not-allowed"
+                          style={{
+                            borderColor: '#FCA5A5',
+                            color: '#B91C1C',
+                            backgroundColor: '#FEF2F2',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#FEE2E2';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#FEF2F2';
+                          }}
                           disabled={isSubmitting}
                         >
                           Remove
@@ -154,7 +166,7 @@ export function ShareTripModal({
                     )}
                     {isOwnerMember && (
                       <span
-                        className="text-xs px-2 py-0.5 rounded"
+                        className="text-[11px] px-2.5 py-0.5 rounded-full font-semibold"
                         style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
                       >
                         Owner
@@ -166,19 +178,24 @@ export function ShareTripModal({
             })}
           </ul>
         </div>
-        <div className="px-4 py-3 border-t flex justify-end gap-2" style={{ borderColor: colors.border }}>
+        <div className="px-5 py-3.5 border-t flex justify-end gap-3 bg-slate-50" style={{ borderColor: colors.border }}>
           <button
             type="button"
-            className="px-3 py-1.5 text-sm rounded-lg"
+            className="px-4 py-2 text-sm rounded-xl font-medium cursor-pointer disabled:cursor-not-allowed"
             onClick={onClose}
             disabled={isSubmitting}
+            style={{ color: colors.textMuted }}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="px-3 py-1.5 text-sm rounded-lg text-white"
-            style={{ backgroundColor: colors.primary, opacity: isSubmitting ? 0.7 : 1 }}
+            className="px-5 py-2 text-sm rounded-xl font-semibold text-white shadow-md cursor-pointer disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: colors.primary,
+              opacity: isSubmitting ? 0.7 : 1,
+              boxShadow: '0 12px 30px rgba(139, 92, 246, 0.4)',
+            }}
             onClick={handleSubmit}
             disabled={isSubmitting}
           >

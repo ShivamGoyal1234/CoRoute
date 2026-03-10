@@ -141,6 +141,7 @@ export default function TripDetailPage() {
           section={section}
           onSectionChange={setSection}
           presenceSectionLabels={SECTION_LABELS}
+          tripId={state.id ?? undefined}
         />
         <TripDetailMain state={state} />
         <CollaborationFeed

@@ -29,6 +29,25 @@ const userSchema = new Schema<IUserDocument>(
       type: String,
       default: null,
     },
+    bio: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'deactivated', 'deleted'],
+      default: 'active',
+      index: true,
+    },
+    deactivatedAt: {
+      type: Date,
+      default: null,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

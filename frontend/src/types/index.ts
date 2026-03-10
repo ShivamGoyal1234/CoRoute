@@ -3,6 +3,9 @@ export interface User {
   email: string;
   name: string;
   avatarUrl?: string;
+  bio?: string;
+  status?: 'active' | 'deactivated' | 'deleted';
+  createdAt?: string;
 }
 
 export interface TripTraveler {

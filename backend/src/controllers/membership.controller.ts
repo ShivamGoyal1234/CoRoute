@@ -6,6 +6,7 @@ import User from '../models/User';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { MemberRole } from '../types';
 import { triggerWebhook } from '../services/webhook.service';
+import { sendTripInviteEmail } from '../services/email.service';
 
 export const inviteMember = async (req: AuthRequest, res: Response) => {
   try {
@@ -19,6 +20,11 @@ export const inviteMember = async (req: AuthRequest, res: Response) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: 'User not found with this email' });
+    }
+
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found' });
     }
 
     const existingMembership = await Membership.findOne({
@@ -44,6 +50,16 @@ export const inviteMember = async (req: AuthRequest, res: Response) => {
       email: user.email,
       role,
     });
+
+    if (req.user) {
+      const inviter = await User.findById(req.user.userId);
+      if (inviter) {
+        void sendTripInviteEmail(user.email, inviter.name, trip.title).catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error('Trip invite email failed:', err);
+        });
+      }
+    }
 
     res.status(201).json({
       message: 'Member invited successfully',
