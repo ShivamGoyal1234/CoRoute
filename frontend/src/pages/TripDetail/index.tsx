@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
@@ -28,6 +28,7 @@ export default function TripDetailPage() {
   const state = useTripDetail();
   const { logout } = useAuth();
   const { joinTrip, leaveTrip, updateSection, seedFeed } = useSocket();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (state.id) {
@@ -126,6 +127,7 @@ export default function TripDetailPage() {
           trip={trip}
           members={members}
           section={section}
+          onOpenSidebar={() => setMobileSidebarOpen(true)}
           onShareClick={() => setShareOpen(true)}
           onEditTripClick={state.openEditTrip}
           onNewExpenseClick={() => state.setNewExpenseFormOpen(true)}
@@ -137,12 +139,32 @@ export default function TripDetailPage() {
       )}
 
       <div className="flex-1 flex min-h-0">
+        {/* Desktop sidebar */}
         <TripDetailSidebar
           section={section}
           onSectionChange={setSection}
           presenceSectionLabels={SECTION_LABELS}
           tripId={state.id ?? undefined}
+          variant="desktop"
         />
+        {mobileSidebarOpen && (
+          <div className="fixed inset-0 z-40 flex md:hidden">
+            <div
+              className="flex-1 bg-black/40"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+            <TripDetailSidebar
+              section={section}
+              onSectionChange={(s) => {
+                setSection(s);
+                setMobileSidebarOpen(false);
+              }}
+              presenceSectionLabels={SECTION_LABELS}
+              tripId={state.id ?? undefined}
+              variant="mobile"
+            />
+          </div>
+        )}
         <TripDetailMain state={state} />
         <CollaborationFeed
           tripId={state.id ?? null}
