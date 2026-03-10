@@ -118,6 +118,12 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
         typing: false,
       }))
     : [];
+  const avatarByUserName: Record<string, string> = {};
+  items.forEach((item) => {
+    if (item.avatarUrl && !avatarByUserName[item.name]) {
+      avatarByUserName[item.name] = item.avatarUrl;
+    }
+  });
   if (minimized) {
     return (
       <aside
@@ -168,44 +174,6 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
         </div>
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-hide p-4 space-y-4">
-        {(dedupedTyping.length > 0 || otherCollabTyping.length > 0) && (
-          <div className="pb-3 mb-3 border-b" style={{ borderColor: colors.border }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.textMuted }}>
-              Typing now
-            </p>
-            {otherCollabTyping.map((t: CollabTypingUser) => (
-              <div key={`collab-${t.userId}`} className="flex gap-3 mb-2">
-                <div
-                  className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
-                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
-                >
-                  {getInitials(t.userName)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: colors.text }}>
-                    <span className="font-medium">{t.userName}</span> is typing…
-                  </p>
-                </div>
-              </div>
-            ))}
-            {dedupedTyping.map((t: TypingUser) => (
-              <div key={`${t.userId}-${t.activityId}`} className="flex gap-3 mb-2">
-                <div
-                  className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
-                  style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
-                >
-                  {getInitials(t.userName)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm" style={{ color: colors.text }}>
-                    <span className="font-medium">{t.userName}</span> is typing a comment
-                    {t.activityTitle ? ` in "${t.activityTitle.length > 25 ? t.activityTitle.slice(0, 25) + '…' : t.activityTitle}"` : '…'}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
         {items.length > 0 ? items.map((item: FeedItem, i: number) => (
           <div key={`${item.name}-${item.time}-${i}`} className="flex gap-3">
             {item.avatarUrl ? (
@@ -241,6 +209,56 @@ export function CollaborationFeed({ tripId, tripNote, onTripNoteChange, useLiveF
           <p className="text-sm py-4" style={{ color: colors.textMuted }}>
             Activity from your collaborators will appear here.
           </p>
+        )}
+        {(dedupedTyping.length > 0 || otherCollabTyping.length > 0) && (
+          <div className="pt-3 mt-3 border-t" style={{ borderColor: colors.border }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: colors.textMuted }}>
+              Typing now
+            </p>
+            {otherCollabTyping.map((t: CollabTypingUser) => (
+              <div key={`collab-${t.userId}`} className="flex gap-3 mb-2">
+                {avatarByUserName[t.userName] ? (
+                  <div className="w-9 h-9 rounded-full shrink-0 overflow-hidden border animate-pulse" style={{ borderColor: colors.border }}>
+                    <img src={avatarByUserName[t.userName]} alt={t.userName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div
+                    className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
+                    style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
+                  >
+                    {getInitials(t.userName)}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm" style={{ color: colors.text }}>
+                    <span className="font-medium">{t.userName}</span> is typing…
+                  </p>
+                </div>
+              </div>
+            ))}
+            {dedupedTyping.map((t: TypingUser) => (
+              <div key={`${t.userId}-${t.activityId}`} className="flex gap-3 mb-2">
+                {avatarByUserName[t.userName] ? (
+                  <div className="w-9 h-9 rounded-full shrink-0 overflow-hidden border animate-pulse" style={{ borderColor: colors.border }}>
+                    <img src={avatarByUserName[t.userName]} alt={t.userName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div
+                    className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-sm font-medium animate-pulse"
+                    style={{ backgroundColor: 'rgba(139, 92, 246, 0.2)', color: colors.primary }}
+                  >
+                    {getInitials(t.userName)}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm" style={{ color: colors.text }}>
+                    <span className="font-medium">{t.userName}</span> is typing a comment
+                    {t.activityTitle ? ` in "${t.activityTitle.length > 25 ? t.activityTitle.slice(0, 25) + '…' : t.activityTitle}"` : '…'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
         <div ref={messagesEndRef} />
       </div>
