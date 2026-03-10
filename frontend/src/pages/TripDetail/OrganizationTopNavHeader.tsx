@@ -25,6 +25,7 @@ const TOP_NAV: { id?: SectionId; label: string; href?: string }[] = [
 ];
 
 interface OrganizationTopNavHeaderProps {
+  tripId: string;
   tripTitle: string;
   section: SectionId;
   onSectionChange: (s: SectionId) => void;
